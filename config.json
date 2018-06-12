@@ -1,0 +1,51 @@
+{
+	"notify": {
+		"email": {
+			"server": "smtp.gmail.com",
+			"port": 587,
+			"login": "email@gmail.com",
+			"password": "strong_password"
+		}
+	},
+	"def": {
+		"log": {
+			"dirpath": "D:/SisuLog",
+			"filenamePattern": "{year}{month}{day}-{hour}{minute}-{utask}-{status}.txt"
+		}
+	},
+	"tasks": [
+		{
+			"name": "Scandinavia #TEMP",
+			"input": [
+				"U:/RU Moscow A101 Scandinavia/#TEMP/rhino test folder/*.dwg"
+			],
+			"test": [
+				{
+					"name": "layerExist",
+					"layer": ["0"]
+				},
+				{
+					"name": "emptyLayer",
+					"layer": ["0", "Default", "Defpoints"]
+				},
+				{
+					"name": "notEmptyLayer",
+					"layer": ["P01"]
+				},
+				{
+					"name": "geometryClosed",
+					"layer": ["P01", "B_K_01"]
+				}
+			],
+			"notify": {
+				"email": {
+					"subject": "{year}{month}{day} {task} - {status}",
+					"emails": [
+						"roman@tmshv.ru", "vp@unit4.io", "lazareffa@mail.ru"
+					]
+				}
+			},
+			"log": "@def/log"
+		}
+	]
+}

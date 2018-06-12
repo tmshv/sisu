@@ -1,6 +1,6 @@
 Option Explicit
 
-Sub TestRhinoAutomation
+Sub RunAutomation
   ' Declare local variables
   Dim objRhino, objShell, strDesktop, strPath
   
@@ -18,15 +18,16 @@ Sub TestRhinoAutomation
   End If
   ' Call WScript.Echo("Rhino object created.")
 
-  WScript.Sleep(1000)
+  WScript.Sleep(500)
 
-  Call objRhino.RunScript("_-RunPythonScript ""C:\Users\Mini\Desktop\DWG_TEST\test.py""", 0)
+  ' Call objRhino.RunScript("_-Open ""D:\Autorhino\data\sample1.3dm""", 0)
+  Call objRhino.RunScript("_-RunPythonScript ""D:\Autorhino\test.py""", 0)
   ' Call objRhino.RunScript("_-RunPythonScript ""test.py""", 0)
   ' Call WScript.Echo("Script executed.")
 
   ' Run some commands
-  Call objRhino.RunScript("_Circle 0 10", 0)
-  Call objRhino.RunScript("_Line -5,-5,0 5,5,0", 0)
+  ' Call objRhino.RunScript("_Circle 0 10", 0)
+  ' Call objRhino.RunScript("_Line -5,-5,0 5,5,0", 0)
   ' Call objRhino.RunScript("_Line 5,-5,0 -5,5,0", 0)
   ' Call WScript.Echo("Geometry created.")
   
@@ -35,11 +36,11 @@ Sub TestRhinoAutomation
   ' Call WScript.Echo("Shell object created.")
   
   ' Get the desktop folder
-  strDesktop = objShell.SpecialFolders("Desktop")
-  strPath = Chr(34) & strDesktop & "\TestRhinoAutomation.3dm" & Chr(34)
+  ' strDesktop = objShell.SpecialFolders("Desktop")
+  ' strPath = Chr(34) & strDesktop & "\TestRhinoAutomation.3dm" & Chr(34)
 
   ' Save the file  
-  Call objRhino.RunScript("_-Save " & strPath, 0)
+  ' Call objRhino.RunScript("_-Save " & strPath, 0)
   ' Call WScript.Echo("File saved.")
  
   ' Exit Rhino
@@ -48,10 +49,5 @@ Sub TestRhinoAutomation
    
 End Sub
 
-Sub Hi
-  ' Call WScript.Echo("Hi")
-End Sub
-
 ' Run the subroutine defined above
-Call Hi
-Call TestRhinoAutomation
+Call RunAutomation
