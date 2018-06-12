@@ -30,14 +30,3 @@ class EmailService:
         s = self.create_client()
         s.sendmail(from_email, to_emails, msg.as_string())
         s.close()
-
-if __name__ == '__main__':
-    c = {
-        'server': 'smtp.yandex.ru',
-        'port': 465,
-        'login': 'robot@unit4.io',
-        'password': 'robotUnit4'
-    }
-    s = EmailService()
-    s.init(**c)
-    s.send(['roman@tmshv.ru'], 'Test', 'hi')
