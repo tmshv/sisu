@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+
 import os
 import sys
+import re
 from datetime import datetime
 
 import rhinoscriptsyntax as rs
@@ -30,21 +33,17 @@ def log(data):
 def clear_log():
     log_data = []
 
-#path = '"D:\\TEMP\\test.stl"'
-#
-#rs.DocumentModified(False)
-#rs.Command('_-Open {} _Enter'.format(path))
-
-#f = open('C:\\Desktop\\DWG_TEST\\out.txt', 'w')
-# f = open('C:\\Users\\Mini\\Desktop\\DWG_TEST\\out.txt', 'w')
-# f.write('hi')
-# f.close()
+# def get_layer(name):
+#     return sc.doc.Layers.FindName(name)
 
 def get_layer(name):
-    i = sc.doc.Layers.FindName(name)
-    return i
-#    i = sc.doc.Layers.FindByFullPath(name, True)
-#    return sc.doc.Layers[i] if i >= 0 else None
+    layer = sc.doc.Layers.FindByFullPath(name, True)
+    if layer >= 0:
+        return sc.doc.Layers[layer]
+    return None
+
+def get_layer_names():
+    return [x.Name for x in sc.doc.Layers]
 
 def get_objects_by_layer(layer_name):
     return sc.doc.Objects.FindByLayer(layer_name)
@@ -59,59 +58,92 @@ def t(v):
     return 'Passed' if v else 'Failed'
 #    return 'Yes' if v else 'No'
 
-def test_layer0():
-    log('Test: layer 0 should be empty')
-    
-    objs = get_objects_by_layer('0')
-    
-    if not objs or len(objs) == 0:
-        return True
-        
-    if isinstance(objs[0], Rhino.DocObjects.InstanceObject):
-        return True
-        
-    return False
+def test_layer_name_match(options):
+    lns = [x.Name for x in sc.doc.Layers]
+    ptr = re.compile(options['regexp'])
+    ignore = options['ignore']
 
-def test_layer_exist(layer_name):
+    s = True
+    for x in sc.doc.Layers:
+        name = x.Name
+        ignored = name in ignore
+
+        if not ignored and not ptr.match(name):
+            log('Not match: {}'.format(name))
+            s = False
+    return s
+
+def test_is_curve_planar(options):
+    layer_name = options['layer']
+    
+    log('Test: curves on layer {} should be planar'.format(layer_name))
+    
+    objs = get_geometry_by_layer(layer_name)
+    for x in objs:
+        if not rs.IsCurvePlanar(x.Id):
+            return False
+    return True
+
+
+def test_is_polyline(options):
+    layer_name = options['layer']
+    
+    log('Test: objects on layer {} should be polyline'.format(layer_name))
+    
+    objs = get_geometry_by_layer(layer_name)
+    for x in objs:
+        if not rs.IsPolyline(x.Id):
+            return False
+    return True
+
+def test_layer_exist(options):
+    layer_name = options['layer']
     log('Test: layer {} should exist'.format(layer_name))
 
     layer = get_layer(layer_name)
 
-    return True if layer else False
+    return bool(layer)
 
-def test_is_layer_empty(layer_name):
+def test_is_layer_empty(options):
+    layer_name = options['layer']
     log('Test: layer {} should be empty'.format(layer_name))
 
-    objs = get_geometry_by_layer(layer_name)
+    return rs.IsLayer(layer_name) and rs.IsLayerEmpty(layer_name)
 
-    if len(objs) == 0:
-        return True
-
-    return False
-
-def test_is_layer_not_empty(layer_name):
+def test_is_layer_not_empty(options):
+    layer_name = options['layer']
     log('Test: layer {} should not be empty'.format(layer_name))
 
+    return rs.IsLayer(layer_name) and not rs.IsLayerEmpty(layer_name)
+
+def test_is_curve_closed(options):
+    layer_name = options['layer']
     geom = get_geometry_by_layer(layer_name)
-
     if len(geom) == 0:
-        return False
+        return None
 
-    return True
-
-def test_is_curve_closed(layer_name):
     log('Test: curves on layer {} should be closed'.format(layer_name))
 
-    for x in get_geometry_by_layer(layer_name):
+    for x in geom:
         valid = rs.IsCurveClosed(x)    
         if not valid:
             return False
+    return True
+    
+
+def test_layer_consistency(options):
+    layer_name = options['layer']
+    types = options['types']
+    log('Test: geometry on layer {layer} should be one of type: {types}'.format(
+        layer=layer_name,
+        types=','.join(types)
+    ))
     return True
 
 
 def open_file(path):
     rs.DocumentModified(False)
-    rs.Command('_-Open {} _Enter'.format(path))
+    rs.Command('_-Open "{}" _Enter'.format(path))
 
 
 def test_factory(test):
@@ -121,7 +153,12 @@ def test_factory(test):
         'emptyLayer': test_is_layer_empty,
         'notEmptyLayer': test_is_layer_not_empty,
         'geometryClosed': test_is_curve_closed,
+        'layerConsistency': test_layer_consistency,
+        'isCurvePlanar': test_is_curve_planar,
+        'isPolyline': test_is_polyline,
+        'layerNameMatch': test_layer_name_match,
     }
+
     return d[name]
 
 def run_task(task):
@@ -129,8 +166,10 @@ def run_task(task):
     log_service.init(task.log)
 
     log(task.name)
-    log('=' * 30)
+    log('=' * 30) 
     log('Date: %s' % task.date.strftime("%d.%m.%Y %H:%M:%S"))
+    log('App: %s' % Rhino.RhinoApp.Name)
+    log('App version %s' % Rhino.RhinoApp.Version)
     log('')
     
     for filepath in task.file():
@@ -139,14 +178,18 @@ def run_task(task):
         log('')
 
         open_file(filepath)
+        layer_names = get_layer_names()
+        task.generate_tests(layer_names)
 
         for test in task.test():
-            name = test['name']
             test_fn = test_factory(test)
-#            print(test)
-            
-            status = test_fn(test['layer'])
+            status = test_fn(test)
+
+            if status == None:
+                continue
+
             task.update_status(status)
+
             log(t(status))
             log('')
 
@@ -162,18 +205,36 @@ def run_task(task):
     log('Log: {}'.format(log_service.create_filepath(task)))
     log('')
 
-    notify_task(task, log_data)
+    sent = notify_task(task, log_data)
+    if sent:
+        emails = task.notify['email']['emails']
+        log('Log was sent to {}'.format(', '.join(emails)))
+    else:
+        log('Log was not sent to {}'.format(', '.join(emails)))
+    write_log(task, log_data)
+
+
+def write_log(task, content):
+    file = task.get_log_file()
+    d = os.path.dirname(file)
+    if not os.path.exists(d):
+        os.makedirs(d)
+    msg = '\n'.join(log_data)
+    with open(file, 'w') as f:
+        f.write(msg)
+    return True
 
 def notify_task(task, content):
     env = task.get_env()
     subject = task.notify['email']['subject'].format(**env)
     emails = task.notify['email']['emails']
+    
     msg = '\n'.join(log_data)
+#    msg = msg.encode('unicode_escape')
 
-    send_email(emails, subject, msg)    
+    email.send(emails, subject, msg)
+    return True
 
-def send_email(emails, subject, body):
-    email.send(emails, subject, body)
 
 def get_config():
     import json
@@ -186,19 +247,15 @@ def taskFactory(config, data):
     def u(s):
         return s.replace(' ', '_')
 
-    def split_tests(tests):
-        def t(test, layer):
-            t = copy(test)
-            t['layer'] = layer
-            return t
+    def get_def(val):
+        name = val[5:]
+        return config['def'][name]
 
-        result = []
-        for test in tests:
-            if 'layer' in test and isinstance(test['layer'], list):
-                result += [t(test, x) for x in test['layer']]
-            else:
-                result.append(test)
-        return result
+    def get_tests(tests):
+        for t in tests:
+            if 'layer' in t and isinstance(t['layer'], str):
+                t['layer'] = get_def(t['layer'])
+        return tests
 
     def get_log(log):
         if isinstance(log, dict):
@@ -209,7 +266,7 @@ def taskFactory(config, data):
     task = {
         'name': data['name'],
         'input': data['input'],
-        'tests': split_tests(data['test']),
+        'tests': get_tests(data['test']),
         'log': get_log(data['log']),
         'notify': data['notify'],
     }
@@ -219,12 +276,62 @@ def taskFactory(config, data):
             self.current_file = None
             self.date = datetime.now()
             self.status = True
+            self._tests = []
 
             self.name = name
             self.input = input
             self.tests = tests
             self.log = log
             self.notify = notify
+
+        def generate_tests(self, layer_names):
+            def get_layers_match(pattern):
+                return [x for x in layer_names if pattern.match(x)]
+            
+            def collect_layers(patterns):
+                layers = []
+                for x in patterns:
+                    pattern = re.compile(x)
+                    layers += get_layers_match(pattern)
+                return layers
+
+            def get_layer_patterns(layers):
+                if isinstance(layers, list):
+                    return layers
+                elif isinstance(layers, str):
+                    [layers]
+                else:
+                    return []
+
+            def split_tests(tests):
+                def t(test, layer):
+                    t = copy(test)
+                    t['layer'] = layer
+                    return t
+
+                result = []
+                for test in tests:
+                    if 'layer' not in test:
+                        result.append(test)
+                        continue
+
+                    layer_patterns = get_layer_patterns(test['layer'])
+                    layers = collect_layers(layer_patterns)                    
+                    result += [t(test, x) for x in layers]
+                    
+                return result
+
+            self._tests = split_tests(self.tests)
+            return self._tests
+
+        def get_log_file(self):
+            log_dir = self.log['dirpath']
+            ptr = self.log['filenamePattern']
+            env = self.get_env()
+            filename = ptr.format(**env)
+            result = os.path.join(log_dir, filename)
+
+            return os.path.normpath(result)
 
         def get_status(self):
             return self.status
@@ -248,7 +355,7 @@ def taskFactory(config, data):
                 yield x
                 
         def test(self):
-            for x in self.tests:
+            for x in self._tests:
                 yield x
                 
         def get_env(self):
@@ -291,9 +398,7 @@ def main():
     for task in tasks:
         run_task(task)
 
-    # import testIsCurvesClosed as test
-    # test.run('asdf')
-    
+    rs.DocumentModified(False)    
 
 
 main()
