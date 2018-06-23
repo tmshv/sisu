@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
+
 # Import smtplib for the actual sending function
 import smtplib
 
 # Import the email modules we'll need
 from email.mime.text import MIMEText
+from email.header import Header
 
 class EmailService:
     def init(self, server, port, login, password):
@@ -22,11 +25,13 @@ class EmailService:
     def send(self, to_emails, subject, body):
         from_email = self.get_from_email()
         to_email = ','.join(to_emails)
-        msg = MIMEText(body)
-        msg['Subject'] = subject
+        h = Header(subject, 'utf-8')
+        msg = MIMEText(body.encode('utf-8'), 'plain', 'utf-8')
+        msg['Subject'] = h
         msg['From'] = from_email
         msg['To'] = to_email
         
         s = self.create_client()
         s.sendmail(from_email, to_emails, msg.as_string())
         s.close()
+

@@ -11,35 +11,43 @@
 		"log": {
 			"dirpath": "D:/SisuLog",
 			"filenamePattern": "{year}{month}{day}-{hour}{minute}-{utask}-{status}.txt"
-		}
+		},
+		"SystemLayers": [
+			"^0$",
+			"^Default$",
+			"^Defpoints$"
+		],
+		"DC_Layer": [
+			"[\\w]_[\\w]_[\\d]{2}"
+		]
 	},
 	"tasks": [
 		{
-			"name": "Scandinavia #TEMP",
+			"name": "Scandinavia II",
 			"input": [
-				"U:/RU Moscow A101 Scandinavia/#TEMP/rhino test folder/*.dwg"
+				"U:/RU Moscow A101 Scandinavia/STAGE II/CY 14 15 18/DWG/*.dwg"
 			],
 			"test": [
 				{
 					"name": "layerExist",
-					"layer": ["0"]
+					"layer": ["^0$"]
 				},
 				{
 					"name": "emptyLayer",
-					"layer": ["0", "Default", "Defpoints"]
-				},
-				{
-					"name": "notEmptyLayer",
-					"layer": ["P01"]
+					"layer": "@def/SystemLayers"
 				},
 				{
 					"name": "geometryClosed",
-					"layer": ["P01", "B_K_01"]
+					"layer": "@def/DC_Layer"
+				},
+				{
+					"name": "isCurvePlanar",
+					"layer": ["B_C_01"]
 				}
 			],
 			"notify": {
 				"email": {
-					"subject": "{year}{month}{day} {task} - {status}",
+					"subject": "Sisu - {status} - {task}",
 					"emails": [
 						"roman@tmshv.ru", "vp@unit4.io", "lazareffa@mail.ru"
 					]
