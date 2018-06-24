@@ -1,0 +1,1 @@
+https://github.com/mcneel/rhino-developer-samples/blob/6/rhinoscript/TestRhino6Automation.vbs
