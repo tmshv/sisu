@@ -18,7 +18,10 @@
 			"^Defpoints$"
 		],
 		"DC_Layer": [
-			"[\\w]_[\\w]_[\\d]{2}"
+			"^[\\w]_[\\w]_[\\d]{2}$"
+		],
+		"DC_Block_Layer": [
+			"^[\\w]_[\\w]$"
 		]
 	},
 	"tasks": [
@@ -38,11 +41,26 @@
 				},
 				{
 					"name": "geometryClosed",
-					"layer": "@def/DC_Layer"
+					"layer": "@def/DC_Layer",
+					"ignore": ["[F]_[\\w]_[\\d]{2}"]
 				},
 				{
 					"name": "isCurvePlanar",
-					"layer": ["B_C_01"]
+					"layer": "@def/DC_Layer"
+				},
+				{
+					"name": "layerConsistency",
+					"layer": "@def/DC_Layer",
+					"types": ["CurveObject"]
+				},
+				{
+					"name": "layerConsistency",
+					"layer": "@def/DC_Block_Layer",
+					"types": ["InstanceObject"]
+				},
+				{
+					"name": "blockNameRelation",
+					"layer": "@def/DC_Block_Layer"
 				}
 			],
 			"notify": {
