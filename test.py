@@ -233,9 +233,21 @@ def run_task(task):
     log('App version %s' % Rhino.RhinoApp.Version)
     log('')
     
+    has_files = task.has_files()
+    if not has_files:
+        log('No files to test')
+
     for filepath in task.file():
+        file_failed = False
+        exist = os.path.isfile(filepath)
+        
         log('.' * 80)
         log('File: {}'.format(filepath))
+        
+        if not exist:
+            log('File not exist')
+            log('')
+            continue
         log('')
 
         open_file(filepath)
@@ -250,6 +262,7 @@ def run_task(task):
             #     continue
 
             if test.is_failed():
+                file_failed = True
                 status = test.get_status()
 
                 log(test.get_description())
@@ -260,6 +273,8 @@ def run_task(task):
 
             # log(t(status))
             # log('')
+        if not file_failed:
+            log('File status: passed')
 
     log('-' * 50)
 #    log('Status: {}'.format(t(task.get_status())))
@@ -355,6 +370,10 @@ def taskFactory(config, data):
             self.log = log
             self.notify = notify
 
+        def has_files(self):
+            files = self.get_files()
+            return len(files) > 0
+
         def generate_tests(self, layer_names):
             def get_layers_match(pattern):
                 return [x for x in layer_names if pattern.match(x)]
@@ -437,8 +456,9 @@ def taskFactory(config, data):
                 yield x
                 
         def get_env(self):
-            dirname = os.path.dirname(self.current_file)
-            filename = os.path.basename(self.current_file)
+            cur_file = self.current_file if self.current_file else ''
+            dirname = os.path.dirname(cur_file)
+            filename = os.path.basename(cur_file)
             file, ext = os.path.splitext(filename)
 
             return {
@@ -452,13 +472,13 @@ def taskFactory(config, data):
                 'file': file,
                 'ext': ext,
                 'filename': filename,
-                'fullpath': self.current_file,
+                'fullpath': cur_file,
                 'status': t(self.status),
                 'utask': u(self.name),
                 'udir': u(dirname),
                 'ufile': u(file),
                 'ufilename': u(filename),
-                'ufullpath': u(self.current_file),
+                'ufullpath': u(cur_file),
             }
 
     return Task(**task)
