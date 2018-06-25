@@ -11,6 +11,11 @@ import Rhino
 
 from notify import EmailService
 
+TEST_PASSED = 0
+TEST_FAILED = 1
+TEST_SKIPPED = 2
+
+
 class LogService:
     def init(self, data):
         self.base_dir = data['dirpath']
@@ -54,9 +59,21 @@ def get_geometry_by_layer(layer_name):
         return []
     return [x for x in objs if not isinstance(x, Rhino.DocObjects.InstanceObject)]
 
+def get_blocks_by_layer(layer_name):
+    objs = get_objects_by_layer(layer_name)
+    if not objs:
+        return []
+    return [x for x in objs if isinstance(x, Rhino.DocObjects.InstanceObject)]
+
+def get_object_type(x):
+    return type(x).__name__
+
 def t(v):
-    return 'Passed' if v else 'Failed'
-#    return 'Yes' if v else 'No'
+    if v == TEST_PASSED:
+        return 'Passed'
+    if v == TEST_FAILED:
+        return 'Failed'
+    return v
 
 def test_layer_name_match(options):
     lns = [x.Name for x in sc.doc.Layers]
@@ -73,10 +90,11 @@ def test_layer_name_match(options):
             s = False
     return s
 
+# @test(lambda x : 'Test: curves on layer {} should be planar'.format(x['layer']))
 def test_is_curve_planar(options):
     layer_name = options['layer']
     
-    log('Test: curves on layer {} should be planar'.format(layer_name))
+    # log('Test: curves on layer {} should be planar'.format(layer_name))
     
     objs = get_geometry_by_layer(layer_name)
     for x in objs:
@@ -88,7 +106,7 @@ def test_is_curve_planar(options):
 def test_is_polyline(options):
     layer_name = options['layer']
     
-    log('Test: objects on layer {} should be polyline'.format(layer_name))
+    # log('Test: objects on layer {} should be polyline'.format(layer_name))
     
     objs = get_geometry_by_layer(layer_name)
     for x in objs:
@@ -97,22 +115,23 @@ def test_is_polyline(options):
     return True
 
 def test_layer_exist(options):
-    layer_name = options['layer']
-    log('Test: layer {} should exist'.format(layer_name))
-
-    layer = get_layer(layer_name)
-
-    return bool(layer)
+    pattern = options['mask']
+    ptr = re.compile(pattern)
+    
+    for name in get_layer_names():
+        if ptr.match(name):
+            return True
+    return False
 
 def test_is_layer_empty(options):
     layer_name = options['layer']
-    log('Test: layer {} should be empty'.format(layer_name))
+    # log('Test: layer {} should be empty'.format(layer_name))
 
     return rs.IsLayer(layer_name) and rs.IsLayerEmpty(layer_name)
 
 def test_is_layer_not_empty(options):
     layer_name = options['layer']
-    log('Test: layer {} should not be empty'.format(layer_name))
+    # log('Test: layer {} should not be empty'.format(layer_name))
 
     return rs.IsLayer(layer_name) and not rs.IsLayerEmpty(layer_name)
 
@@ -121,8 +140,6 @@ def test_is_curve_closed(options):
     geom = get_geometry_by_layer(layer_name)
     if len(geom) == 0:
         return None
-
-    log('Test: curves on layer {} should be closed'.format(layer_name))
 
     for x in geom:
         valid = rs.IsCurveClosed(x)    
@@ -134,12 +151,22 @@ def test_is_curve_closed(options):
 def test_layer_consistency(options):
     layer_name = options['layer']
     types = options['types']
-    log('Test: geometry on layer {layer} should be one of type: {types}'.format(
-        layer=layer_name,
-        types=','.join(types)
-    ))
+    for x in get_objects_by_layer(layer_name):
+        t = get_object_type(x)
+        if t not in types:
+            return False
     return True
 
+def test_block_name(options):
+    layer_name = options['layer']
+
+    for x in get_blocks_by_layer(layer_name):
+        name = rs.BlockInstanceName(x.Id)
+        pattern = '^{layer}'.format(layer=layer_name)
+        if not re.match(pattern, name):
+            return False
+            
+    return True
 
 def open_file(path):
     rs.DocumentModified(False)
@@ -148,18 +175,52 @@ def open_file(path):
 
 def test_factory(test):
     name = test['name']
+    default_description = lambda x : x['name']
+
     d = {
-        'layerExist': test_layer_exist,
-        'emptyLayer': test_is_layer_empty,
-        'notEmptyLayer': test_is_layer_not_empty,
-        'geometryClosed': test_is_curve_closed,
-        'layerConsistency': test_layer_consistency,
-        'isCurvePlanar': test_is_curve_planar,
-        'isPolyline': test_is_polyline,
-        'layerNameMatch': test_layer_name_match,
+        'layerExist':       [test_layer_exist,        lambda x : 'Test: layer {mask} should exist'.format(**x)],
+        'emptyLayer':       [test_is_layer_empty,     default_description],
+        'notEmptyLayer':    [test_is_layer_not_empty, default_description],
+        'geometryClosed':   [test_is_curve_closed,    lambda x : 'Curves on layer {layer} should be closed'.format(**x)],
+        'layerConsistency': [test_layer_consistency,  lambda x : 'Geometry on layer {layer} should be one of type: {types}'.format(layer=x['layer'], types=','.join(x['types']))],
+        'isCurvePlanar':    [test_is_curve_planar,    default_description],
+        'isPolyline':       [test_is_polyline,        default_description],
+        'layerNameMatch':   [test_layer_name_match,   default_description],
+        'blockNameRelation':[test_block_name,         lambda x : 'Block name on layer {layer} should start with {layer}'.format(**x)],
     }
 
-    return d[name]
+    def s(status):
+        if status == None:
+            return TEST_SKIPPED
+        elif status == False:
+            return TEST_FAILED
+        elif status == True:
+            return TEST_PASSED
+
+    class Test:
+        def __init__(self, name, fn, dc):
+            self.name = name
+            self.fn = fn
+            self.dc = dc
+
+        def make_description(self, options):
+            return self.dc(options)
+
+        def run(self, options):
+            status = self.fn(options)
+            self.status = s(status)
+            self.description = self.make_description(options)
+
+        def is_failed(self):
+            return self.status == TEST_FAILED
+
+        def get_status(self):
+            return self.status
+
+        def get_description(self):
+            return self.description
+
+    return Test(name, d[name][0], d[name][1])
 
 def run_task(task):
     clear_log()
@@ -181,33 +242,40 @@ def run_task(task):
         layer_names = get_layer_names()
         task.generate_tests(layer_names)
 
-        for test in task.test():
-            test_fn = test_factory(test)
-            status = test_fn(test)
+        for test_data in task.test():
+            test = test_factory(test_data)
+            test.run(test_data)
 
-            if status == None:
-                continue
+            # if status == None:
+            #     continue
 
-            task.update_status(status)
+            if test.is_failed():
+                status = test.get_status()
 
-            log(t(status))
-            log('')
+                log(test.get_description())
+                log(t(status))
+                log('')
+
+                task.update_status(False)
+
+            # log(t(status))
+            # log('')
 
     log('-' * 50)
-    log('Status: {}'.format(t(task.get_status())))
+#    log('Status: {}'.format(t(task.get_status())))
 
-    if task.get_status():
-        log('You passed the test successfully. Mission acomplished.')
-    else:
-        log('You failed the test and should be destroyed.')
-    log('')
+#    if task.get_status():
+#        log('You passed the test successfully. Mission acomplished.')
+#    else:
+#        log('You failed the test and should be destroyed.')
+#    log('')
 
     log('Log: {}'.format(log_service.create_filepath(task)))
     log('')
 
+    emails = task.notify['email']['emails']
     sent = notify_task(task, log_data)
     if sent:
-        emails = task.notify['email']['emails']
         log('Log was sent to {}'.format(', '.join(emails)))
     else:
         log('Log was not sent to {}'.format(', '.join(emails)))
@@ -239,6 +307,9 @@ def notify_task(task, content):
 def get_config():
     import json
     return json.load(open('config.json', 'rb'))
+
+def test_result_factory(name, description, status, log):
+    return {}
 
 def taskFactory(config, data):
     from glob import glob
@@ -287,13 +358,19 @@ def taskFactory(config, data):
         def generate_tests(self, layer_names):
             def get_layers_match(pattern):
                 return [x for x in layer_names if pattern.match(x)]
-            
-            def collect_layers(patterns):
+
+            def get_layers_by_patterns(patterns):
                 layers = []
                 for x in patterns:
                     pattern = re.compile(x)
                     layers += get_layers_match(pattern)
                 return layers
+            
+            def collect_layers(patterns, patterns_ignore):
+                layers = get_layers_by_patterns(patterns)
+                ignore = get_layers_by_patterns(patterns_ignore)
+
+                return [x for x in layers if x not in ignore]
 
             def get_layer_patterns(layers):
                 if isinstance(layers, list):
@@ -315,8 +392,9 @@ def taskFactory(config, data):
                         result.append(test)
                         continue
 
+                    layer_patterns_ignore = get_layer_patterns(test.get('ignore', []))
                     layer_patterns = get_layer_patterns(test['layer'])
-                    layers = collect_layers(layer_patterns)                    
+                    layers = collect_layers(layer_patterns, layer_patterns_ignore)                    
                     result += [t(test, x) for x in layers]
                     
                 return result
