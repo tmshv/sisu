@@ -76,7 +76,14 @@
 				"email": {
 					"subject": "Sisu - {task} - {day}.{month}.{year} {hour}:{minute}",
 					"emails": [
-						"vp@unit4.io", "roman@tmshv.ru"
+						"vp@unit4.io",
+						"roman@tmshv.ru",
+						"nie.smth@gmail.com",
+						"menhir.y@gmail.com",
+						"nikitin@rmshk.ru",
+						"niushaaaaaaa@gmail.com",
+						"ollya.che@gmail.com",
+						"vladimirova.elizavet@gmail.com"
 					]
 				}
 			},
