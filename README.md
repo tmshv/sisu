@@ -1,6 +1,6 @@
-https://github.com/mcneel/rhino-developer-samples/blob/6/rhinoscript/TestRhino6Automation.vbs
+# Sisu
 
-##TestList:
+## Test list
 
 1. layerExist         test if Layer is exist
 2. emptyLayer         test if Layer is empty
@@ -9,3 +9,7 @@ https://github.com/mcneel/rhino-developer-samples/blob/6/rhinoscript/TestRhino6A
 5. layerConsistency   test curve objects on specific layers
 6. layerConsistency   test block objects on specific layers
 7. blockNameRelation  test relation between block name and layer name where block exists
+
+## Links
+
+- [TestRhino6Automation](https://github.com/mcneel/rhino-developer-samples/blob/6/rhinoscript/TestRhino6Automation.vbs)
