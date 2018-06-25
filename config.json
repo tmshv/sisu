@@ -9,8 +9,8 @@
 	},
 	"def": {
 		"log": {
-			"dirpath": "D:/SisuLog",
-			"filenamePattern": "{year}{month}{day}-{hour}{minute}-{utask}-{status}.txt"
+			"dirpath": "U:/RU Moscow A101 Scandinavia/#TEMPLATE/SISU/SISU_LOG",
+			"filenamePattern": "{year}{month}{day}-{hour}{minute}-{utask}.txt"
 		},
 		"SystemLayers": [
 			"^0$",
@@ -18,19 +18,25 @@
 			"^Defpoints$"
 		],
 		"DC_Layer": [
-			"^[\\w]_[\\w]_[\\d]{2}$"
+			"^[A-Z]_[A-Z]_[\\d]{2}$"
 		],
 		"DC_Block_Layer": [
-			"^[\\w]_[\\w]$"
+			"^[A-Z]_[A-Z]$"
 		]
 	},
 	"tasks": [
 		{
 			"name": "Scandinavia Stage II",
+			"input2": [
+				"U:/RU Moscow A101 Scandinavia/STAGE II/CY 14 15 18/DWG/CY 14.dwg"
+			],
 			"input": [
 				"U:/RU Moscow A101 Scandinavia/STAGE II/CY 14 15 18/DWG/*.dwg",
+				"U:/RU Moscow A101 Scandinavia/STAGE II/PRK/DWG/*.dwg",
 				"U:/RU Moscow A101 Scandinavia/STAGE II/PRK/#WIP/DWG/*.dwg",
+				"U:/RU Moscow A101 Scandinavia/STAGE II/BLV SQ/DWG/*.dwg",
 				"U:/RU Moscow A101 Scandinavia/STAGE II/BLV SQ/#WIP/DWG/*.dwg",
+				"U:/RU Moscow A101 Scandinavia/STAGE II/STR+BRG/DWG/*.dwg",
 				"U:/RU Moscow A101 Scandinavia/STAGE II/STR+BRG/#WIP/DWG/*.dwg"
 			],
 			"test": [
@@ -40,7 +46,7 @@
 				},
 				{
 					"name": "layerExist",
-					"mask": "^[\\w]_[\\w]_[\\d]{2}$"
+					"mask": "^[A-Z]_[A-Z]_[\\d]{2}$"
 				},
 				{
 					"name": "emptyLayer",
@@ -49,7 +55,7 @@
 				{
 					"name": "geometryClosed",
 					"layer": "@def/DC_Layer",
-					"ignore": ["[F]_[\\w]_[\\d]{2}"]
+					"ignore": ["[FBL]_[A-Z]_[\\d]{2}"]
 				},
 				{
 					"name": "layerConsistency",
