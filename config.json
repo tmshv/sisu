@@ -26,14 +26,21 @@
 	},
 	"tasks": [
 		{
-			"name": "Scandinavia II",
+			"name": "Scandinavia Stage II",
 			"input": [
-				"U:/RU Moscow A101 Scandinavia/STAGE II/CY 14 15 18/DWG/*.dwg"
+				"U:/RU Moscow A101 Scandinavia/STAGE II/CY 14 15 18/DWG/*.dwg",
+				"U:/RU Moscow A101 Scandinavia/STAGE II/PRK/#WIP/DWG/*.dwg",
+				"U:/RU Moscow A101 Scandinavia/STAGE II/BLV SQ/#WIP/DWG/*.dwg",
+				"U:/RU Moscow A101 Scandinavia/STAGE II/STR+BRG/#WIP/DWG/*.dwg"
 			],
 			"test": [
 				{
 					"name": "layerExist",
-					"layer": ["^0$"]
+					"mask": "^0$"
+				},
+				{
+					"name": "layerExist",
+					"mask": "^[\\w]_[\\w]_[\\d]{2}$"
 				},
 				{
 					"name": "emptyLayer",
@@ -43,10 +50,6 @@
 					"name": "geometryClosed",
 					"layer": "@def/DC_Layer",
 					"ignore": ["[F]_[\\w]_[\\d]{2}"]
-				},
-				{
-					"name": "isCurvePlanar",
-					"layer": "@def/DC_Layer"
 				},
 				{
 					"name": "layerConsistency",
@@ -65,9 +68,9 @@
 			],
 			"notify": {
 				"email": {
-					"subject": "Sisu - {status} - {task}",
+					"subject": "Sisu - {task} - {day}.{month}.{year} {hour}:{minute}",
 					"emails": [
-						"roman@tmshv.ru", "vp@unit4.io", "lazareffa@mail.ru"
+						"vp@unit4.io", "roman@tmshv.ru"
 					]
 				}
 			},
