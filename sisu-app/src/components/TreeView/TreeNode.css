@@ -12,11 +12,3 @@
 .TreeNode.root {
     --nodes-shift: 0;
 }
-
-.TreeNode button {
-    text-align: left;
-}
-
-.TreeNode button:hover {
-    cursor: pointer;
-}

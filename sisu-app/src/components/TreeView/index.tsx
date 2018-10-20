@@ -6,6 +6,7 @@ export interface ITreeViewProps {
     tree: ITreeNode,
     onClick: (event: Event, node: ITreeNode) => void,
     onFoldChange: (node: ITreeNode) => void,
+    renderNode(node: ITreeNode, onClick: (event: Event) => void): JSX.Element,
 }
 
 export default class TreeView extends React.Component<ITreeViewProps, any, any> {
@@ -17,6 +18,7 @@ export default class TreeView extends React.Component<ITreeViewProps, any, any> 
                     node={this.props.tree}
                     onClick={this.props.onClick}
                     onFoldChange={this.props.onFoldChange}
+                    renderNode={this.props.renderNode}
                 />
             </div>
         );

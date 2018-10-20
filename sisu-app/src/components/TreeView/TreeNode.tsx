@@ -9,6 +9,7 @@ export interface ITreeNodeProps {
     mix?: string,
     onFoldChange: (node: ITreeNode) => void,
     onClick: (event: Event, node: ITreeNode) => void,
+    renderNode(node: ITreeNode, onClick: (event: Event) => void): JSX.Element, 
 }
 
 export default class TreeNode extends React.Component<ITreeNodeProps, any, any> {
@@ -27,7 +28,7 @@ export default class TreeNode extends React.Component<ITreeNodeProps, any, any> 
         return (
             <div className={className('TreeNode', this.props.mix)}>
                 {!node.name ? null : (
-                    this.renderNodeName()
+                    this.renderNode()
                 )}
                 {!this.hasChildren ? null : (
                     this.renderNodes()
@@ -38,16 +39,8 @@ export default class TreeNode extends React.Component<ITreeNodeProps, any, any> 
 
     private onClick = (event: Event) => this.props.onClick(event, this.props.node)
 
-    private renderNodeName() {
-        const c: any = this.onClick
-
-        return (
-            <button
-                onClick={c}
-            >
-                {this.props.node.name}
-            </button>
-        )
+    private renderNode() {
+        return this.props.renderNode(this.props.node, this.onClick)
     }
 
     private renderNodes() {
@@ -59,6 +52,7 @@ export default class TreeNode extends React.Component<ITreeNodeProps, any, any> 
                         node={node}
                         onClick={this.props.onClick}
                         onFoldChange={this.props.onFoldChange}
+                        renderNode={this.props.renderNode}
                     />
                 ))}
             </div>

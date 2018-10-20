@@ -1,4 +1,5 @@
 import * as React from 'react';
+import FileTreeNode from './components/FileTreeNode';
 import TreeView from './components/TreeView';
 import { ITreeNode, treeFromFlat } from './components/TreeView/lib';
 import logo from './logo.svg';
@@ -25,7 +26,7 @@ class App extends React.Component {
     data: null,
   }
 
-  public componentDidMount(){
+  public componentDidMount() {
     fetch('/data.json')
       .then(res => res.json())
       .then((data: any) => {
@@ -36,7 +37,7 @@ class App extends React.Component {
   }
 
   public render() {
-    if(!this.state.data){
+    if (!this.state.data) {
       return null
     }
 
@@ -61,10 +62,20 @@ class App extends React.Component {
             tree={tree}
             onClick={this.onClick}
             onFoldChange={this.onFold}
+            renderNode={this.renderTreeNode}
           />
         </div>
       </div>
     );
+  }
+
+  private renderTreeNode = (node: ITreeNode, onClick: (event: Event) => void) => {
+    return (
+      <FileTreeNode
+        node={node}
+        onClick={onClick}
+      />
+    )
   }
 
   private onClick = (event: Event, n: ITreeNode) => {
