@@ -1,0 +1,22 @@
+.TreeNode {
+    --nodes-shift: 30px;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.TreeNode > .nodes{
+    margin-left: var(--nodes-shift);
+}
+
+.TreeNode.root {
+    --nodes-shift: 0;
+}
+
+.TreeNode button {
+    text-align: left;
+}
+
+.TreeNode button:hover {
+    cursor: pointer;
+}
