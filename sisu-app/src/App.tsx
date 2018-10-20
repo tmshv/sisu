@@ -2,7 +2,6 @@ import * as React from 'react';
 import FileTreeNode from './components/FileTreeNode';
 import TreeView from './components/TreeView';
 import { ITreeNode, treeFromFlat } from './components/TreeView/lib';
-import logo from './logo.svg';
 
 import './App.css';
 
@@ -23,39 +22,38 @@ import './App.css';
 
 class App extends React.Component {
   public state = {
-    data: null,
+    project: null,
   }
 
   public componentDidMount() {
-    fetch('/data.json')
+    const projectUrl = '/project/5bcb773f989b58a5b994bd7c/info'
+    const url = `http://localhost:5000${projectUrl}`
+
+    fetch(url)
       .then(res => res.json())
       .then((data: any) => {
         this.setState({
-          data,
+          project: data.resource,
         })
       })
   }
 
   public render() {
-    if (!this.state.data) {
+    if (!this.state.project) {
       return null
     }
 
-    const data: any = this.state.data
+    const project: any = this.state.project
+    const files: string[] = project.files;
 
-    const tree = treeFromFlat(data.files)
+    const tree = treeFromFlat(files)
     console.log(tree)
 
     return (
       <div className="App">
         <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
+          <h1 className="App-title">{project.name}</h1>
         </header>
-
-        <p className="App-intro">
-          To get started, edit <code>src/App.tsx</code> and save to reload.
-        </p>
 
         <div className="App-tree">
           <TreeView
