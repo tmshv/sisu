@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { getRequest } from 'src/api';
+import FileInfo from '../FileInfo';
 import FileTreeNode from '../FileTreeNode';
 import Header from '../Header';
 import TreeView from '../TreeView';
@@ -26,14 +27,19 @@ interface IProps {
     match: any,
 }
 
-export default class PageProject extends React.Component<IProps, {}, any> {
+interface IState {
+    project: any,
+    file: any,
+}
+
+export default class PageProject extends React.Component<IProps, IState, any> {
     public state = {
+        file: null,
         project: null,
     }
 
     public componentDidMount() {
-        const projectId = this.props.match.params.id;
-        const url = `/projects/${projectId}/info`
+        const url = `/projects/${this.projectId}/info`
 
         getRequest(url)
             .then(res => res.json())
@@ -53,7 +59,6 @@ export default class PageProject extends React.Component<IProps, {}, any> {
         const files: string[] = project.files;
 
         const tree = treeFromFlat(files)
-        console.log(tree)
 
         return (
             <div className="PageProject">
@@ -61,16 +66,28 @@ export default class PageProject extends React.Component<IProps, {}, any> {
                     title={project.name}
                 />
 
-                <div className="tree">
-                    <TreeView
-                        tree={tree}
-                        onClick={this.onClick}
-                        onFoldChange={this.onFold}
-                        renderNode={this.renderTreeNode}
-                    />
+                <div className="content">
+                    <div className="tree">
+                        <TreeView
+                            tree={tree}
+                            onClick={this.onClick}
+                            onFoldChange={this.onFold}
+                            renderNode={this.renderTreeNode}
+                        />
+                    </div>
+
+                    {!this.state.file ? null : (
+                        <FileInfo
+                            file={this.state.file}
+                        />
+                    )}
                 </div>
             </div>
         );
+    }
+
+    private get projectId(): string {
+        return this.props.match.params.id;
     }
 
     private renderTreeNode = (node: ITreeNode, onClick: (event: Event) => void) => {
@@ -83,7 +100,19 @@ export default class PageProject extends React.Component<IProps, {}, any> {
     }
 
     private onClick = (event: Event, n: ITreeNode) => {
-        console.log(n)
+        // console.log(n)
+
+        getRequest(`/projects/${this.projectId}/file`, {
+            file: n.id,
+        })
+            .then(res => res.json())
+            .then((data: any) => {
+                const file = data.resource;
+
+                this.setState({
+                    file,
+                });
+            })
     }
 
     private onFold = (n: ITreeNode) => {

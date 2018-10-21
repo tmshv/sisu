@@ -1,3 +1,7 @@
+.TreeView {
+    width: 100%;
+}
+
 .TreeNode {
     --nodes-shift: 30px;
 
