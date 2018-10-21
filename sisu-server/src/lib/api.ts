@@ -12,6 +12,12 @@ export function error(error: object): object {
     };
 }
 
+export function resource(resource: any): object {
+    return success({
+        resource,
+    });
+}
+
 export function errorMessage(message: string): object {
     return error({
         message,

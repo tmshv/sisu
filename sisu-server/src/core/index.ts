@@ -1,16 +1,18 @@
 import { ObjectId } from "bson";
 
 export interface IUser {
+    _id: ObjectId;
     email: string;
     password: string;
     salt: string;
+    projects: ObjectId[];
 }
 
 export interface IProject {
     _id: ObjectId;
     version: string;
     name: string;
-    uri: object;
+    uri: string;
     files: IProjectFile[];
     config: object;
     lastState: IProjectState;

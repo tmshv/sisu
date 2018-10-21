@@ -1,40 +1,23 @@
-import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { Db } from "mongodb";
-import { JWT_SECRET } from "../util/secrets";
-import { findUserByEmail } from "../data/user";
-import { matchPassword } from "../util/secure";
+import { resource } from "../lib/api";
+import { IExternalUser } from "../core/external";
 import { IUser } from "../core";
+import { findProjectsById } from "../data/project";
+import { createProjectInfo } from "../core/factory";
 
-export function postLogin(db: Db) {
+export function getUser(db: Db) {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const email: string = req.body.email;
-    const password: string = req.body.password;
+    const user: IUser = req.user as IUser;
 
-    let user: IUser;
+    const projects = await findProjectsById(db, user.projects);
 
-    try {
-      user = await findUserByEmail(db, email);
-    } catch (error) {
-      return res.status(401).json({
-        error: "User not found",
-      });
-    }
+    const userInfo: IExternalUser = {
+      id: `${user._id}`,
+      email: user.email,
+      projects: projects.map(createProjectInfo)
+    };
 
-    // This lookup would normally be done using a database
-    if (!matchPassword(password, user)) {
-      return res.status(401).json({
-        error: "Auth Failed",
-      });
-    }
-
-    const token = jwt.sign({ email }, JWT_SECRET, {
-      // expiresIn: 120,  // token expires in 2min
-    });
-
-    return res.status(200).json({
-      status: "Ok",
-      token,
-    });
+    return res.json(resource(userInfo));
   };
 }

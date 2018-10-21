@@ -11,31 +11,10 @@ import { initPassport, isAuthenticated } from "./config/passport";
 import { success, error, errorMessage } from "./lib/api";
 
 // Controllers (route handlers)
+import * as authController from "./controllers/auth";
 import * as userController from "./controllers/user";
 import { IProject, IProjectFile, IProjectState } from "./core";
 import { createProjectInfo } from "./core/factory";
-
-function oid(id: string): ObjectId {
-  try {
-    return new ObjectId(id);
-  } catch (e) {
-    return undefined;
-  }
-}
-
-function resourceQuery(param: string): object {
-  const id = oid(param);
-
-  if (!id) {
-    return {
-      uri: param,
-    };
-  }
-
-  return {
-    _id: id,
-  };
-}
 
 function array<T>(maybeArray?: Array<T>): Array<T> {
   return Array.isArray(maybeArray)
@@ -253,7 +232,9 @@ export function createServer(db: Db): Application {
     }
   });
 
-  app.post("/login", userController.postLogin(db));
+  app.get("/user", isAuthenticated, userController.getUser(db));
+
+  app.post("/login", authController.postLogin(db));
   // app.post("/forgot", userController.postForgot);
   // app.post("/reset/:token", userController.postReset);
 
