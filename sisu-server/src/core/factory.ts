@@ -1,5 +1,5 @@
-import { IProject } from ".";
-import { IProjectInfo } from "./external";
+import { IProject, IUser } from ".";
+import { IProjectInfo, IExternalUser } from "./external";
 
 export function createProjectInfo(project: IProject): IProjectInfo {
     return {
@@ -7,5 +7,13 @@ export function createProjectInfo(project: IProject): IProjectInfo {
         id: `${project._id}`,
         uri: project.uri,
         files: project.lastState.projectFilenames,
+    };
+}
+
+export function createExternalUser(user: IUser, projects: IProject[]): IExternalUser {
+    return {
+        id: `${user._id}`,
+        email: user.email,
+        projects: projects.map(createProjectInfo)
     };
 }

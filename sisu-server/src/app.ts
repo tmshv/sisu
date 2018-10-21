@@ -15,6 +15,7 @@ import * as authController from "./controllers/auth";
 import * as userController from "./controllers/user";
 import { IProject, IProjectFile, IProjectState } from "./core";
 import { createProjectInfo } from "./core/factory";
+import { findProject } from "./data/project";
 
 function array<T>(maybeArray?: Array<T>): Array<T> {
   return Array.isArray(maybeArray)
@@ -63,9 +64,7 @@ export function createServer(db: Db): Application {
 
   app.get("/projects/:id", isAuthenticated, async (req: Request, res: Response) => {
     const projectId = req.params.id;
-    const project = await db.collection("projects").findOne(
-      resourceQuery(projectId)
-    );
+    const project = await findProject(db, projectId);
 
     if (!project) {
       res.status(404);
@@ -81,9 +80,7 @@ export function createServer(db: Db): Application {
 
   app.get("/projects/:id/info", isAuthenticated, async (req: Request, res: Response) => {
     const projectId = req.params.id;
-    const project = await db.collection("projects").findOne(
-      resourceQuery(projectId)
-    ) as IProject;
+    const project = await findProject(db, projectId);
 
     if (!project) {
       res.status(404);
@@ -110,9 +107,7 @@ export function createServer(db: Db): Application {
       }));
     }
 
-    const project = await db.collection("projects").findOne(
-      resourceQuery(projectId)
-    ) as IProject;
+    const project = await findProject(db, projectId);
 
     if (!project) {
       res.status(404);
@@ -140,9 +135,7 @@ export function createServer(db: Db): Application {
     const projectId = req.params.id;
     const file = req.body as IProjectFile;
 
-    const project = await db.collection("projects").findOne(
-      resourceQuery(projectId)
-    );
+    const project = await findProject(db, projectId);
 
     if (!project) {
       res.status(404);
@@ -173,9 +166,7 @@ export function createServer(db: Db): Application {
     const projectId = req.params.id;
     const config = req.body;
 
-    const project = await db.collection("projects").findOne(
-      resourceQuery(projectId)
-    );
+    const project = await findProject(db, projectId);
 
     if (!project) {
       res.status(404);
@@ -202,9 +193,7 @@ export function createServer(db: Db): Application {
     const projectId = req.params.id;
     const state = req.body as IProjectState;
 
-    const project = await db.collection("projects").findOne(
-      resourceQuery(projectId)
-    );
+    const project = await findProject(db, projectId);
 
     if (!project) {
       res.status(404);
@@ -239,7 +228,7 @@ export function createServer(db: Db): Application {
   // app.post("/reset/:token", userController.postReset);
 
   app.all("*", (req: Request, res: Response) => {
-      return res.status(404).json(errorMessage("Not found"));
+    return res.status(404).json(errorMessage("Not found"));
   });
 
   return app;
