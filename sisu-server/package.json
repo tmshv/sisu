@@ -44,9 +44,13 @@
     "passport-local": "^1.0.0",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
+    "passport-jwt": "^4.0.0",
+    "jsonwebtoken": "^8.3.0",
     "winston": "^2.4.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^7.2.8",
+    "@types/passport-jwt": "^3.0.1",
     "@types/async": "^2.0.45",
     "@types/bcrypt-nodejs": "^0.0.30",
     "@types/body-parser": "^1.16.8",
