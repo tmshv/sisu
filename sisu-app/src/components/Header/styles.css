@@ -1,0 +1,51 @@
+.Header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    padding: 5px 10px;
+    background-color: var(--first-color);
+    color: var(--second-color);
+    text-align: left;
+}
+
+.Header .main {
+    flex: 1;
+
+    display: flex;
+}
+
+.Header .title {
+    font-size: 1.5em;
+    line-height: 1.5em;
+    /* padding: 0px 10px; */
+    margin-right: 20px;
+}
+
+.Header .title:last-child {
+    margin-right: 0;
+}
+
+.Header a {
+    /* z-index: 1; */
+    /* display: block; */
+    /* position: relative; */
+    color: var(--second-color);
+    text-decoration: none;
+}
+
+/* .Header a:hover::before {
+    z-index: -1;
+    content: '';
+    position: absolute;
+    bottom: 7px;
+    left: 8px;
+    width: calc(100% - 16px);
+    height: 8px;
+    background-color: var(--active-color);
+} */
+
+.Header a:hover {
+    /* background-color: var(--active-color); */
+    color: var(--active-color);
+}

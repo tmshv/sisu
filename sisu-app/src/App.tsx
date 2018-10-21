@@ -1,87 +1,64 @@
 import * as React from 'react';
-import FileTreeNode from './components/FileTreeNode';
-import TreeView from './components/TreeView';
-import { ITreeNode, treeFromFlat } from './components/TreeView/lib';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { getRequest } from './api';
+import PageHome from './components/PageHome';
+import PageLogin from './components/PageLogin';
+import PageProject from './components/PageProject';
+import { UserContext } from './context';
 
 import './App.css';
 
-// const tree = node('', [
-//   node('1', [
-//     node('4', []),
-//     node('5', []),
-//     node('6', []),
-//   ]),
-//   node('2', [
-//     node('7', []),
-//     node('8', [
-//       node('9', []),
-//     ]),
-//   ]),
-//   node('3', []),
-// ])
+interface IState {
+  init: boolean;
+  user: any;
+}
 
-class App extends React.Component {
+class App extends React.Component<{}, IState, any> {
   public state = {
-    project: null,
+    init: false,
+    user: null,
   }
 
   public componentDidMount() {
-    const projectUrl = '/project/5bcb773f989b58a5b994bd7c/info'
-    const url = `http://localhost:5000${projectUrl}`
+    getRequest('/user')
+      .then(res => {
+        if (res.status !== 200) {
+          throw new Error("User no authorized");
+        }
 
-    fetch(url)
-      .then(res => res.json())
-      .then((data: any) => {
+        return res.json()
+      })
+      .then(res => {
         this.setState({
-          project: data.resource,
-        })
+          init: true,
+          user: res.resource,
+        });
+      })
+      .catch(err => {
+        this.setState({
+          init: true,
+        });
       })
   }
 
   public render() {
-    if (!this.state.project) {
-      return null
+    if (!this.state.init) {
+      return null;
     }
 
-    const project: any = this.state.project
-    const files: string[] = project.files;
-
-    const tree = treeFromFlat(files)
-    console.log(tree)
-
     return (
-      <div className="App">
-        <header className="App-header">
-          <h1 className="App-title">{project.name}</h1>
-        </header>
-
-        <div className="App-tree">
-          <TreeView
-            tree={tree}
-            onClick={this.onClick}
-            onFoldChange={this.onFold}
-            renderNode={this.renderTreeNode}
-          />
-        </div>
-      </div>
+      <UserContext.Provider value={{
+        user: this.state.user,
+      }}>
+        <Router>
+          <div className={"App"}>
+            <Route exact={true} path="/" component={PageHome} />
+            <Route path="/login" component={PageLogin} />
+            <Route path="/project/:id" component={PageProject} />
+          </div>
+        </Router>
+      </UserContext.Provider>
     );
-  }
-
-  private renderTreeNode = (node: ITreeNode, onClick: (event: Event) => void) => {
-    return (
-      <FileTreeNode
-        node={node}
-        onClick={onClick}
-      />
-    )
-  }
-
-  private onClick = (event: Event, n: ITreeNode) => {
-    console.log(n)
-  }
-
-  private onFold = (n: ITreeNode) => {
-    console.log(n)
   }
 }
 
