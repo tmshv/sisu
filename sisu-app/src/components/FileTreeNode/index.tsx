@@ -1,3 +1,4 @@
+import { FolderIcon, FolderOpenIcon } from 'mdi-react'
 import * as React from 'react'
 import { ITreeNode } from '../TreeView/lib'
 
@@ -6,10 +7,11 @@ import './styles.css'
 export interface IFileTreeNodeProps {
     node: ITreeNode,
     onClick: (event: Event, node: ITreeNode) => void,
+    onFoldClick: (event: Event) => void,
 }
 
 export default class FileTreeNode extends React.Component<IFileTreeNodeProps, any, any> {
-    public render(){
+    public render() {
         return (
             <div
                 className={'FileTreeNode'}
@@ -22,6 +24,7 @@ export default class FileTreeNode extends React.Component<IFileTreeNodeProps, an
     private renderName() {
         const node = this.props.node
         const c: any = this.props.onClick
+        const f: any = this.props.onFoldClick
 
         if (/dwg$/.test(node.id)) {
             return (
@@ -32,10 +35,23 @@ export default class FileTreeNode extends React.Component<IFileTreeNodeProps, an
                 </button>
             )
         } else {
+            const Icon = node.folded
+                ? FolderIcon
+                : FolderOpenIcon
+
             return (
-                <span>
-                    {node.name}
-                </span>
+                <div className={'folder'}>
+                    <Icon
+                        color={'#ccc'}
+                        size={15}
+                    />
+
+                    <button
+                        onClick={f}
+                    >
+                        {node.name}
+                    </button>
+                </div>
             )
         }
     }

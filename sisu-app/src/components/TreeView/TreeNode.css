@@ -14,5 +14,5 @@
 }
 
 .TreeNode.root {
-    --nodes-shift: 0;
+    /* --nodes-shift: 0; */
 }

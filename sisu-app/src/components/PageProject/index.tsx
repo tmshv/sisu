@@ -30,12 +30,14 @@ interface IProps {
 interface IState {
     project: any,
     file: any,
+    tree?: ITreeNode,
 }
 
 export default class PageProject extends React.Component<IProps, IState, any> {
     public state = {
         file: null,
         project: null,
+        tree: undefined,
     }
 
     public componentDidMount() {
@@ -44,9 +46,7 @@ export default class PageProject extends React.Component<IProps, IState, any> {
         getRequest(url)
             .then(res => res.json())
             .then((data: any) => {
-                this.setState({
-                    project: data.resource,
-                })
+                this.setProject(data.resource)
             })
     }
 
@@ -56,9 +56,7 @@ export default class PageProject extends React.Component<IProps, IState, any> {
         }
 
         const project: any = this.state.project
-        const files: string[] = project.files;
-
-        const tree = treeFromFlat(files)
+        const tree = this.state.tree!
 
         return (
             <div className="PageProject">
@@ -86,15 +84,32 @@ export default class PageProject extends React.Component<IProps, IState, any> {
         );
     }
 
+    private setProject(project: any) {
+        const files: string[] = project.files;
+        const tree = treeFromFlat(files)
+
+        this.setState({
+            project,
+            tree,
+        })
+    }
+
     private get projectId(): string {
         return this.props.match.params.id;
     }
 
-    private renderTreeNode = (node: ITreeNode, onClick: (event: Event) => void) => {
+    private renderTreeNode = (
+        node: ITreeNode,
+        onClick: (event: Event, node: ITreeNode) => void,
+        onFoldChange: (node: ITreeNode) => void,
+    ) => {
+        const on: any = () => this.onFold(node)
+
         return (
             <FileTreeNode
                 node={node}
                 onClick={onClick}
+                onFoldClick={on}
             />
         )
     }
@@ -116,6 +131,11 @@ export default class PageProject extends React.Component<IProps, IState, any> {
     }
 
     private onFold = (n: ITreeNode) => {
+        console.log('Change fold')
         console.log(n)
+
+        n.folded = !n.folded
+
+        this.forceUpdate()
     }
 }

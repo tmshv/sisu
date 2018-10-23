@@ -9,12 +9,20 @@ export interface ITreeNodeProps {
     mix?: string,
     onFoldChange: (node: ITreeNode) => void,
     onClick: (event: Event, node: ITreeNode) => void,
-    renderNode(node: ITreeNode, onClick: (event: Event) => void): JSX.Element, 
+    renderNode(
+        node: ITreeNode,
+        onClick: (event: Event, node: ITreeNode) => void,
+        onFoldChange: (node: ITreeNode) => void,
+    ): JSX.Element,
 }
 
 export default class TreeNode extends React.Component<ITreeNodeProps, any, any> {
-    private get hasChildren(): boolean {
+    private get hasContent(): boolean {
         const { node } = this.props
+
+        if (node.folded) {
+            return false
+        }
 
         if (!node.nodes) {
             return false
@@ -25,12 +33,13 @@ export default class TreeNode extends React.Component<ITreeNodeProps, any, any> 
 
     public render() {
         const { node } = this.props
+
         return (
             <div className={className('TreeNode', this.props.mix)}>
                 {!node.name ? null : (
                     this.renderNode()
                 )}
-                {!this.hasChildren ? null : (
+                {!this.hasContent ? null : (
                     this.renderNodes()
                 )}
             </div>
@@ -40,7 +49,7 @@ export default class TreeNode extends React.Component<ITreeNodeProps, any, any> 
     private onClick = (event: Event) => this.props.onClick(event, this.props.node)
 
     private renderNode() {
-        return this.props.renderNode(this.props.node, this.onClick)
+        return this.props.renderNode(this.props.node, this.onClick, this.props.onFoldChange)
     }
 
     private renderNodes() {

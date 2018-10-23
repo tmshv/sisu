@@ -11,7 +11,7 @@
     font-size: var(--font-size);
     font-weight: bold;
 
-    background-color: #e9e9e9;
+    /* background-color: #e9e9e9; */
     padding: 4px 5px;
 }
 
@@ -19,7 +19,7 @@
     text-align: var(--text-align);
     font-size: var(--font-size);
 
-    background-color: white;
+    background: none;
     padding: 3px 5px;
     border: none;
 }
@@ -27,5 +27,14 @@
 .FileTreeNode button:hover {
     cursor: pointer;
 
-    background-color: gold;
+    background-color: #e7e6e0;
+}
+
+.FileTreeNode .folder{
+    display: flex;
+    align-items: center;
+}
+
+.FileTreeNode .folder button{
+    flex: 1;
 }
