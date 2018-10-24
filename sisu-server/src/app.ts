@@ -17,6 +17,7 @@ import * as userController from "./controllers/user";
 import { IProjectFile, IProjectState } from "./core";
 import { createProjectInfo } from "./core/factory";
 import { findProject } from "./data/project";
+import { normalizePath } from "./util";
 import { ENVIRONMENT } from "./util/secrets";
 
 function array<T>(maybeArray?: Array<T>): Array<T> {
@@ -124,7 +125,7 @@ export function createServer(db: Db): Application {
       }));
     }
 
-    const resource = project.files.find(x => x.filename === filename);
+    const resource = project.files.find(x => filename === normalizePath(x.filename));
 
     if (!resource) {
       res.status(404);
