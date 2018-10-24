@@ -1,0 +1,31 @@
+version: '3'
+
+volumes:
+  data:
+
+services:
+  mongo:
+    image: mongo:4
+    restart: always
+    volumes:
+      - data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=master
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_INITDB_DATABASE=sisu
+  api:
+    build:
+      context: ./sisu-server
+    links:
+      - mongo
+    depends_on:
+      - mongo
+    environment:
+      - PORT=5000
+      - MONGODB_URI=mongodb://master:${MONGO_PASSWORD}mongo:27017/sisu
+      - JWT_SECRET=${JWT_SECRET}
+  app:
+    build:
+      context: ./sisu-app
+    depends_on:
+      - api
