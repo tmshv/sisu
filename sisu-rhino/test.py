@@ -3,6 +3,8 @@
 import os
 import sys
 import re
+import urllib2
+import json
 from datetime import datetime
 
 import rhinoscriptsyntax as rs
@@ -14,6 +16,81 @@ from notify import EmailService
 TEST_PASSED = 0
 TEST_FAILED = 1
 TEST_SKIPPED = 2
+
+TOKEN = None
+
+def api_url(path):
+    return 'http://sisu.unit4.io/api{path}'.format(path=path)
+
+
+def merge_dict(x, y):
+    z = x.copy()
+    z.update(y)
+    return z
+
+
+def request_headers(custom_headers):
+    auth_headers = {} if not TOKEN else {
+        'Authorization': 'Bearer %s' % TOKEN,
+    }
+    return merge_dict(custom_headers, auth_headers)
+
+
+def request_send(req):
+    try:
+        f = urllib2.urlopen(req)
+        res = f.read()
+        f.close()
+        return json.loads(res)
+    except Exception as e:
+        print(e)
+        print(url)
+        return None
+
+
+def request_post(url, data):
+    body = json.dumps(data).encode('utf-8')
+    headers = request_headers({
+        'Content-Type': 'application/json',
+    })
+    req = urllib2.Request(url, headers=headers, data=body)
+    return request_send(req)
+
+
+def request_get(url):
+    headers = request_headers({})
+    req = urllib2.Request(url, headers=headers)
+    return request_send(req)
+
+
+def api_authorize(email, password):
+    auth = {
+        'email': email,
+        'password': password,
+    }
+    res = request_post(api_url('/login'), auth)
+    if 'token' in res:
+        global TOKEN
+        TOKEN = res['token']
+        return True
+    else:
+        return False
+
+
+def api_user():
+    res = request_get(api_url('/user'))
+    if not res:
+        return None
+    else:
+        return res['resource']
+
+
+def api_project_config(project_id):
+    res = request_get(api_url('/projects/%s/config' % project_id))
+    if not res:
+        return None
+    else:
+        return res['resource']
 
 
 class LogService:
