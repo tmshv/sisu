@@ -93,6 +93,10 @@ def api_project_config(project_id):
         return res['resource']
 
 
+def load_settings():
+    return json.load(open('settings.json', 'rb'))
+
+
 class LogService:
     def init(self, data):
         self.base_dir = data['dirpath']
@@ -396,10 +400,6 @@ def notify_task(task, content):
     return True
 
 
-def get_config():
-    import json
-    return json.load(open('config.json', 'rb'))
-
 def test_result_factory(name, description, status, log):
     return {}
 
@@ -566,14 +566,33 @@ def get_tasks(config):
 
 
 def main():
-    config = get_config()
-    email.init(**config['notify']['email'])
-    tasks = get_tasks(config)
+    settings = load_settings()
+    email = settings['auth']['email']
+    password = settings['auth']['password']
 
-    for task in tasks:
-        run_task(task)
+    auth = api_authorize(email, password)
+    if not auth:
+        print('Cannot authorize')
+        return
 
-    rs.DocumentModified(False)    
+    user = api_user()
+    if not user:
+        print('Cannot find user')
+        return
 
+    for project in user['projects']:
+        print(project['name'])
+
+        pid = project['id']
+        config = api_project_config(pid)
+
+        # config = get_config()
+        # email.init(**config['notify']['email'])
+        tasks = get_tasks(config)
+
+        for task in tasks:
+            run_task(task)
+
+        rs.DocumentModified(False)
 
 main()
