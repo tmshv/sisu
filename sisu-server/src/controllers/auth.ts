@@ -16,6 +16,9 @@ export function postLogin(db: Db) {
     try {
       user = await findUserByEmail(db, email);
     } catch (error) {
+    }
+
+    if (!user) {
       return res.status(401).json({
         error: "User not found",
       });
