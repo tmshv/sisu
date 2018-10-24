@@ -16,9 +16,9 @@ export default class FileInfo extends React.Component<IProps, {}, any> {
             <div className="FileInfo">
                 <h2>Log</h2>
 
-                <p>
+                <pre>
                     {file.log}
-                </p>
+                </pre>
             </div>
         );
     }
