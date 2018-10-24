@@ -1,19 +1,19 @@
-import errorHandler from "errorhandler";
-import { createServer } from "./app";
 import { MongoClient } from "mongodb";
+import { createServer } from "./app";
+import logger from "./util/logger";
 import { MONGODB_URI, PORT } from "./util/secrets";
 
 async function getDb() {
   try {
     const client = await MongoClient.connect(MONGODB_URI, {
-      useNewUrlParser: false,
+      useNewUrlParser: true,
     });
 
     return client.db("sisu");
 
-    console.log("Connected to MongoDB");
+    logger.info("Connected to MongoDB");
   } catch (error) {
-    console.log(error);
+    logger.error(error);
 
     process.exit(1);
   }
@@ -22,11 +22,6 @@ async function getDb() {
 async function main() {
   const db = await getDb();
   const app = createServer(db);
-
-  /**
-   * Error Handler. Provides full stack - remove for production
-   */
-  app.use(errorHandler());
 
   /**
    * Start Express server.

@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from "express";
-import { Db, ObjectId } from "mongodb";
+import { Db } from "mongodb";
 import compression from "compression";  // compresses requests
+import errorHandler from "errorhandler";
 import cors from "cors";
 import bodyParser from "body-parser";
 import logger from "./util/logger";
@@ -13,9 +14,10 @@ import { success, error, errorMessage } from "./lib/api";
 // Controllers (route handlers)
 import * as authController from "./controllers/auth";
 import * as userController from "./controllers/user";
-import { IProject, IProjectFile, IProjectState } from "./core";
+import { IProjectFile, IProjectState } from "./core";
 import { createProjectInfo } from "./core/factory";
 import { findProject } from "./data/project";
+import { ENVIRONMENT } from "./util/secrets";
 
 function array<T>(maybeArray?: Array<T>): Array<T> {
   return Array.isArray(maybeArray)
@@ -37,6 +39,12 @@ export function createServer(db: Db): Application {
   app.use(passport.initialize());
   app.use(lusca.xframe("SAMEORIGIN"));
   app.use(lusca.xssProtection(true));
+
+  if (ENVIRONMENT !== "production") {
+    // Error Handler. Provides full stack - remove for production
+
+    app.use(errorHandler());
+  }
 
   // app.use((req, res, next) => {
   //   res.locals.user = req.user;
