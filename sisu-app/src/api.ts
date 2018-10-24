@@ -1,38 +1,54 @@
 import * as qs from "querystring";
 
-export function request(url: string, options: any = {}) {
-    const baseUrl = 'http://localhost:5000'
-
-    const token = localStorage.getItem("authKey");
-    const customHeaders = !token ? {} : ({
+function getAuthHeaders(): any {
+    const token = localStorage.getItem("authToken");
+    
+    return !token ? {} : ({
         'Authorization': `Bearer ${token}`,
-    })
+    });
+}
 
-    return fetch(baseUrl + url, {
+export function makeRequest(path: string, options: any = {}) {
+    const url = buildUrl(path);
+    const authHeaders = getAuthHeaders();
+
+    return fetch(url, {
         ...options,
         headers: {
             ...options.headers,
-            ...customHeaders,
+            ...authHeaders,
         }
     })
 }
 
-export function getRequest(path: string, query?: object) {
-    const url = buildUrl(path, query ? query : {});
+export function postRequest(path: string, data: any, options: any = {}) {
+    const body = JSON.stringify(data);
 
-    const token = localStorage.getItem("authToken");
-    const customHeaders: any = !token ? {} : ({
-        'Authorization': `Bearer ${token}`,
-    });
-
-    return fetch(url, {
-        headers: new Headers(customHeaders),
+    return makeRequest(path, {
+        ...options,
+        body,
+        headers: {
+            ...options.headers,
+            'Content-Type': 'application/json',
+        },
+        method: "POST",
     })
 }
 
-function buildUrl(url: string, query: object): string {
-    const baseUrl = 'http://localhost:5000'
-    const q = qs.stringify(query);
+export function getRequest(path: string, query?: object) {
+    const url = buildUrl(path, query);
+    const authHeaders = getAuthHeaders();
 
-    return baseUrl + url + '?' + q;
+    return fetch(url, {
+        headers: new Headers(authHeaders),
+    })
+}
+
+function buildUrl(url: string, query?: object): string {
+    const baseUrl = process.env.REACT_APP_API
+    const q = !query ? "" : (
+        `?${qs.stringify(query)}`
+    );
+
+    return baseUrl + url + q;
 }

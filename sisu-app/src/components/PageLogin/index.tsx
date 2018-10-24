@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { postRequest } from 'src/api';
 
 import './styles.css';
 
@@ -73,18 +74,10 @@ export default class PageLogin extends React.Component<IProps, IState, any> {
             password: this.state.password,
         }
 
-        const req: RequestInit = {
-            body: JSON.stringify(data),
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            method: "POST",
-        }
-
         this.setState({
             loading: true
         }, () => {
-            fetch('http://localhost:5000/login', req)
+            postRequest("/login", data)
                 .then(res => {
                     if (res.status !== 200) {
                         throw new Error("No authorized")
