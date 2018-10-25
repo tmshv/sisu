@@ -7,8 +7,11 @@
     "flat-to-nested": "^1.1.0",
     "lodash": "^4.17.11",
     "mdi-react": "^4.4.0",
+    "prismjs": "^1.15.0",
     "react": "^16.5.2",
+    "react-document-title": "^2.0.3",
     "react-dom": "^16.5.2",
+    "react-simple-code-editor": "^0.6.1",
     "react-router-dom": "^4.3.1",
     "react-scripts-ts": "3.1.0"
   },
@@ -19,6 +22,8 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
+    "@types/react-document-title": "^2.0.3",
+    "@types/prismjs": "^1.9.0",
     "@types/react-router-dom": "^4.3.1",
     "@types/classnames": "^2.2.6",
     "@types/jest": "^23.3.5",

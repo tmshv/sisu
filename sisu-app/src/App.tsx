@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { getRequest } from './api';
 import PageHome from './components/PageHome';
 import PageLogin from './components/PageLogin';
 import PageProject from './components/PageProject';
+import PageProjectConfig from './components/PageProjectConfig';
 import { UserContext } from './context';
 
 import './App.css';
@@ -52,9 +53,12 @@ class App extends React.Component<{}, IState, any> {
       }}>
         <Router>
           <div className={"App"}>
-            <Route exact={true} path="/" component={PageHome} />
-            <Route path="/login" component={PageLogin} />
-            <Route path="/project/:id" component={PageProject} />
+            <Switch>
+              <Route exact={true} path="/" component={PageHome} />
+              <Route path="/login" component={PageLogin} />
+              <Route path="/project/:id/config" component={PageProjectConfig} />
+              <Route path="/project/:id" component={PageProject} />
+            </Switch>
           </div>
         </Router>
       </UserContext.Provider>

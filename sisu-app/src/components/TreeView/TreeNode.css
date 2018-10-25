@@ -3,7 +3,7 @@
 }
 
 .TreeNode {
-    --nodes-shift: 30px;
+    --nodes-shift: 20px;
 
     display: flex;
     flex-direction: column;
@@ -11,8 +11,4 @@
 
 .TreeNode > .nodes{
     margin-left: var(--nodes-shift);
-}
-
-.TreeNode.root {
-    /* --nodes-shift: 0; */
 }

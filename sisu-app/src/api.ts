@@ -2,7 +2,7 @@ import * as qs from "querystring";
 
 function getAuthHeaders(): any {
     const token = localStorage.getItem("authToken");
-    
+
     return !token ? {} : ({
         'Authorization': `Bearer ${token}`,
     });
@@ -32,6 +32,31 @@ export function postRequest(path: string, data: any, options: any = {}) {
             'Content-Type': 'application/json',
         },
         method: "POST",
+    })
+}
+
+export function putRequest(path: string, data: any, options: any = {}) {
+    let body: any;
+    let headers: any;
+
+    if (typeof data === "string") {
+        body = data;
+        headers = {};
+    } else {
+        body = JSON.stringify(data);
+        headers = {
+            'Content-Type': 'application/json',
+        };
+    }
+
+    return makeRequest(path, {
+        ...options,
+        body,
+        headers: {
+            ...options.headers,
+            ...headers,
+        },
+        method: "PUT",
     })
 }
 
