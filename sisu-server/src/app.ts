@@ -15,6 +15,7 @@ import { success, error, errorMessage } from "./lib/api";
 import * as authController from "./controllers/auth";
 import * as userController from "./controllers/user";
 import * as projectController from "./controllers/project";
+import * as fileController from "./controllers/file";
 import { createProjectInfo } from "./core/factory";
 import { ENVIRONMENT } from "./util/secrets";
 
@@ -54,11 +55,7 @@ export function createServer(db: Db): Application {
   //   express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
   // );
 
-  app.post("/upload", isAuthenticated, async (req: Request, res: Response) => {
-    res.json({
-      previewImageUrl: "",
-    });
-  });
+  app.post("/upload", isAuthenticated, fileController.createFile("file"), fileController.postUpload());
 
   app.get("/projects", isAuthenticated, async (req: Request, res: Response) => {
     const projects = await db.collection("projects").find({}).toArray();
