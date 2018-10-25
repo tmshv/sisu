@@ -73,7 +73,10 @@ export function createServer(db: Db): Application {
   app.put("/projects/:id/file", isAuthenticated, projectController.setProjectFile(db));
 
   app.get("/projects/:id/config", isAuthenticated, projectController.getProjectConfig(db));
-  app.put("/projects/:id/config", isAuthenticated, projectController.setProjectConfig(db));
+  // app.put("/projects/:id/config", isAuthenticated, projectController.setProjectConfig(db));
+
+  app.get("/projects/:id/config-data", isAuthenticated, projectController.getProjectConfigData(db));
+  app.put("/projects/:id/config-data", isAuthenticated, projectController.setProjectConfigData(db));
 
   app.post("/projects/:id/update-state", isAuthenticated, projectController.updateProjectState(db));
 

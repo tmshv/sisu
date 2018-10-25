@@ -119,6 +119,63 @@ export function setProjectFile(db: Db) {
     };
 }
 
+export function getProjectConfigData(db: Db) {
+    return async (req: Request, res: Response) => {
+        const projectId = req.params.id;
+        const project = await findProject(db, projectId);
+
+        if (!project) {
+            res.status(404);
+            return res.json(error({
+                message: `Project ${projectId} not found`,
+            }));
+        }
+
+        const configData = project.configData || "";
+
+        res.json(resource(configData));
+    };
+}
+
+export function setProjectConfigData(db: Db) {
+    const projects = db.collection("projects");
+
+    return async (req: Request, res: Response) => {
+        const projectId = req.params.id;
+        const project = await findProject(db, projectId);
+        const configData = `${req.body.data}`;
+        let config: any = undefined;
+
+        try {
+            config = JSON.parse(configData);
+        } catch (e) {
+            return res.status(400).json(error({
+                message: `Config is not a json string`,
+            }));
+        }
+
+        if (!project) {
+            res.status(404);
+            return res.json(error({
+                message: `Project ${projectId} not found`,
+            }));
+        }
+
+        try {
+            await projects.updateOne({ _id: project._id }, {
+                $set: {
+                    configData,
+                    config,
+                }
+            });
+
+            res.json(resource(configData));
+        } catch (e) {
+            res.json(error(e));
+        }
+    };
+}
+
 export function setProjectConfig(db: Db) {
     return async (req: Request, res: Response) => {
         const projects = db.collection("projects");
