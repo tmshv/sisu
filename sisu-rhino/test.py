@@ -57,6 +57,16 @@ def request_post(url, data):
     return request_send(req)
 
 
+def request_put(url, data):
+    body = json.dumps(data).encode('utf-8')
+    headers = request_headers({
+        'Content-Type': 'application/json',
+    })
+    req = urllib2.Request(url, headers=headers, data=body)
+    req.get_method = lambda: 'PUT'
+    return request_send(req)
+
+
 def request_get(url):
     headers = request_headers({})
     req = urllib2.Request(url, headers=headers)
@@ -93,6 +103,36 @@ def api_project_config(project_id):
         return res['resource']
 
 
+def api_project_update_file(project_id, filename, log_list):
+    log = '\n'.join(log_list)
+    data = {
+        'filename': filename,
+        'log': log,
+        'lastScanTs': 1,
+        'previewImageUrl': '',
+    }
+
+    res = request_put(api_url('/projects/%s/file' % project_id), data)
+
+    print(filename)
+    print(res)
+    print(log)
+
+
+def api_project_update_state(project_id, files):
+    data = {
+        'projectFilenames': files,
+        'lastScanTs': 1,
+        'workerAppVersion': '',
+    }
+
+    res = request_post(api_url('/projects/%s/update-state' % project_id), data)
+
+    print(files)
+    print(res)
+    print(log)
+
+
 def load_settings():
     return json.load(open('settings.json', 'rb'))
 
@@ -113,10 +153,11 @@ log_service = LogService()
 log_data = []
 
 def log(data):
-    print(data)
+#    print(data)
     log_data.append(data)
 
 def clear_log():
+    global log_data
     log_data = []
 
 # def get_layer(name):
@@ -303,32 +344,23 @@ def test_factory(test):
 
     return Test(name, d[name][0], d[name][1])
 
-def run_task(task):
-    clear_log()
-    log_service.init(task.log)
-
-    log(task.name)
-    log('=' * 30) 
-    log('Date: %s' % task.date.strftime("%d.%m.%Y %H:%M:%S"))
-    log('App: %s' % Rhino.RhinoApp.Name)
-    log('App version %s' % Rhino.RhinoApp.Version)
-    log('')
-    
-    has_files = task.has_files()
-    if not has_files:
-        log('No files to test')
+def run_task(project_id, task):
+#    has_files = task.has_files()
+#    if not has_files:
+#        log('No files to test')
 
     for filepath in task.file():
+        clear_log()
+
+        log(task.name)
+        log('=' * 30) 
+        log('Date: %s' % task.date.strftime("%d.%m.%Y %H:%M:%S"))
+        log('App: %s' % Rhino.RhinoApp.Name)
+        log('App version %s' % Rhino.RhinoApp.Version)
+        log('')
+
         file_failed = False
-        exist = os.path.isfile(filepath)
-        
-        log('.' * 80)
         log('File: {}'.format(filepath))
-        
-        if not exist:
-            log('File not exist')
-            log('')
-            continue
         log('')
 
         open_file(filepath)
@@ -357,7 +389,8 @@ def run_task(task):
         if not file_failed:
             log('File status: passed')
 
-    log('-' * 50)
+        log('-' * 50)
+        api_project_update_file(project_id, filepath, log_data)
 #    log('Status: {}'.format(t(task.get_status())))
 
 #    if task.get_status():
@@ -366,16 +399,16 @@ def run_task(task):
 #        log('You failed the test and should be destroyed.')
 #    log('')
 
-    log('Log: {}'.format(log_service.create_filepath(task)))
-    log('')
+#    log('Log: {}'.format(log_service.create_filepath(task)))
+#    log('')
 
-    emails = task.notify['email']['emails']
-    sent = notify_task(task, log_data)
-    if sent:
-        log('Log was sent to {}'.format(', '.join(emails)))
-    else:
-        log('Log was not sent to {}'.format(', '.join(emails)))
-    write_log(task, log_data)
+#    emails = task.notify['email']['emails']
+#    sent = notify_task(task, log_data)
+#    if sent:
+#        log('Log was sent to {}'.format(', '.join(emails)))
+#    else:
+#        log('Log was not sent to {}'.format(', '.join(emails)))
+#    write_log(task, log_data)
 
 
 def write_log(task, content):
@@ -430,12 +463,12 @@ def taskFactory(config, data):
         'name': data['name'],
         'input': data['input'],
         'tests': get_tests(data['test']),
-        'log': get_log(data['log']),
-        'notify': data['notify'],
+#        'log': get_log(data['log']),
+#        'notify': data['notify'],
     }
     
     class Task:
-        def __init__(self, name, input, tests, log, notify):
+        def __init__(self, name, input, tests):
             self.current_file = None
             self.date = datetime.now()
             self.status = True
@@ -444,8 +477,8 @@ def taskFactory(config, data):
             self.name = name
             self.input = input
             self.tests = tests
-            self.log = log
-            self.notify = notify
+#            self.log = log
+#            self.notify = notify
 
         def has_files(self):
             files = self.get_files()
@@ -581,18 +614,16 @@ def main():
         return
 
     for project in user['projects']:
-        print(project['name'])
-
         pid = project['id']
         config = api_project_config(pid)
 
-        # config = get_config()
         # email.init(**config['notify']['email'])
         tasks = get_tasks(config)
 
         for task in tasks:
-            run_task(task)
+            run_task(pid, task)
+            api_project_update_state(pid, task.get_files())
 
-        rs.DocumentModified(False)
+#        rs.DocumentModified(False)
 
 main()
