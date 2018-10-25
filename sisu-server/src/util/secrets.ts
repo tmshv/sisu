@@ -12,6 +12,8 @@ export const ENVIRONMENT = process.env.NODE_ENV;
 export const PORT = process.env.PORT;
 export const MONGODB_URI = process.env.MONGODB_URI;
 export const JWT_SECRET = process.env.JWT_SECRET;
+export const UPLOAD_DIR = process.env.UPLOAD_DIR;
+export const UPLOAD_PUBLIC_PATH = process.env.UPLOAD_PUBLIC_PATH;
 
 if (!MONGODB_URI) {
     logger.error("No mongo connection string. Set MONGODB_URI environment variable.");
