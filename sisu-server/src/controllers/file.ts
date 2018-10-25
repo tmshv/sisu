@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import multer from "multer";
 import crypto from "crypto";
-import { resource } from "../lib/api";
+import { resource, errorMessage } from "../lib/api";
 import { UPLOAD_DIR } from "../util/secrets";
 import { UPLOAD_PUBLIC_PATH } from "../util/secrets";
 
@@ -57,6 +57,10 @@ export function postUpload() {
         //   path: 'static/uploads/bf6075170b34eca67514e4b734819482',
         //   size: 351322,
         // }
+
+        if (!req.file) {
+            return res.status(400).json(errorMessage("Cannot save file"));
+        }
 
         const filepath = `${UPLOAD_PUBLIC_PATH}${req.file.filename}`;
 
