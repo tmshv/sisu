@@ -102,7 +102,7 @@ export function setProjectFile(db: Db) {
         }
 
         let files = array(project.files) as IProjectFile[];
-        files = files.filter(x => x.filename !== file.filename);
+        files = files.filter(x => file.filename !== normalizePath(x.filename));
         files = [...files, file];
 
         try {
