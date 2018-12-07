@@ -44,7 +44,6 @@ def request_send(req):
         return json.loads(res)
     except Exception as e:
         print(e)
-        print(url)
         return None
 
 
