@@ -1,8 +1,6 @@
 import pika
 import json
 import sys
-import os
-from glob import glob
 
 import core
 
