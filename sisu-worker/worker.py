@@ -30,7 +30,7 @@ def callback(ch, method, properties, body):
 if __name__ == '__main__':
     queue = 'sisu'
     host = sys.argv[1]
-    port = sys.argv[1]
+    port = int(sys.argv[2])
     params = pika.ConnectionParameters(host, port, '/')
     connection = pika.BlockingConnection(params)
     channel = connection.channel()
