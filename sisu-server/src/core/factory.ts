@@ -6,7 +6,7 @@ export function createProjectInfo(project: IProject): IProjectInfo {
         name: project.name,
         id: `${project._id}`,
         uri: project.uri,
-        files: project.lastState.projectFilenames,
+        files: project.lastState.files.map(x => x.file),
     };
 }
 
