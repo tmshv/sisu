@@ -14,7 +14,7 @@ export interface IProject {
     name: string;
     uri: string;
     files: IProjectFile[];
-    config: object;
+    config: any;
     configData: string;
     lastState: IProjectState;
 }

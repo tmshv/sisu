@@ -223,6 +223,26 @@ export function getProjectConfig(db: Db) {
     };
 }
 
+export function getProjectConfigInput(db: Db) {
+    return async (req: Request, res: Response) => {
+        const projectId = req.params.id;
+        const project = await findProject(db, projectId);
+
+        if (!project) {
+            res.status(404);
+            return res.json(error({
+                message: `Project ${projectId} not found`,
+            }));
+        }
+
+        const tasks: any[] = project.config.tasks;
+        const inputs = tasks.map((x: any) => x.input);
+        const input = inputs.reduce((a, b) => [...a, ...b], []);
+
+        res.json(resource(input));
+    };
+}
+
 export function updateProjectState(db: Db) {
     return async (req: Request, res: Response) => {
         const projects = db.collection("projects");
