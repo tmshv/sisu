@@ -38,7 +38,7 @@ def handle_file_tree_update(message):
 
 def handle_file_test(message):
     filename = message['payload']['filename']
-    subprocess.call('cscript test.vbs {f}'.format(f=filename))
+    subprocess.call('cscript test.vbs "{f}"'.format(f=filename))
 
 
 def handle_message(message):
