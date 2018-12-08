@@ -20,10 +20,19 @@ def get_file_info(filepath):
     }
 
 
+def get_file_tree(patterns):
+    files = []
+    for x in patterns:
+        files += glob(x)
+    return [get_file_info(x) for x in files]
+
+
 def handle_file_tree_update(message):
     mask = message['payload']['mask']
-    files = glob(mask)
-    return [get_file_info(x) for x in files]
+    patterns = mask if isinstance(mask, list) else [mask]
+    files = get_file_tree(patterns)
+
+    return files
 
 
 def handle_message(message):
