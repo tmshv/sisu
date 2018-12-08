@@ -258,10 +258,13 @@ export function updateProjectState(db: Db) {
             }));
         }
 
-        const scopeFiles = array(state.projectFilenames) as string[];
-        let files = array(project.files) as IProjectFile[];
+        const scopeFiles = array(state.files);
 
-        files = files.filter(x => scopeFiles.includes(x.filename));
+        let files = array(project.files);
+        files = files.filter(x => {
+            const filename = x.filename;
+            return scopeFiles.find(f => f.file === filename);
+        });
 
         try {
             await projects.updateOne({ _id: project._id }, {
@@ -272,6 +275,28 @@ export function updateProjectState(db: Db) {
             });
 
             res.json(success());
+        } catch (e) {
+            res.json(error(e));
+        }
+    };
+}
+
+export function getProjectState(db: Db) {
+    return async (req: Request, res: Response) => {
+        const projects = db.collection("projects");
+        const projectId = req.params.id;
+
+        const project = await findProject(db, projectId);
+
+        if (!project) {
+            res.status(404);
+            return res.json(error({
+                message: `Project ${projectId} not found`,
+            }));
+        }
+
+        try {
+            res.json(resource(project.lastState));
         } catch (e) {
             res.json(error(e));
         }

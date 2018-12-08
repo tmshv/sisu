@@ -26,8 +26,14 @@ export interface IProjectFile {
     lastScanTs: number;
 }
 
+export interface IFileMetadata {
+    file: string;
+    hash: string;
+    type: string;
+}
+
 export interface IProjectState {
-    projectFilenames: string[];
+    files: IFileMetadata[];
     lastScanTs: number;
     workerAppVersion: string;
 }
