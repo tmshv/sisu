@@ -68,7 +68,7 @@ GET /api/v1/projects/<project_id>/config/input
 
 ### FILE_TREE.UPDATE
 
-Load latest file tree structure. Save in data base with `/api/v1/projects/<project_id>/update-state`
+Load latest file tree structure
 
 Request:
 ```js
@@ -97,6 +97,8 @@ Response:
 
 Test file. Save result with with `/api/v1/projects/<>/file`
 
+Request:
+
 ```js
 {
     action: "FILE.TEST",
@@ -105,6 +107,12 @@ Test file. Save result with with `/api/v1/projects/<>/file`
         tests: SisuTest[],
     },
 }
+```
+
+Response:
+
+```js
+null
 ```
 
 ### FILE.UPDATE_PREVIEW
