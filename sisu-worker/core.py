@@ -4,6 +4,20 @@ from glob import glob
 import subprocess
 
 
+def save_rhino_task_file(task):
+    task_file = os.path.expanduser('~/Desktop/sisu_task.json')
+    with open(task_file, 'w') as f:
+        data = json.dumps(task, indent=4, ensure_ascii=False)
+        f.write(data)
+
+
+def read_rhino_result_file():
+    result_file = os.path.expanduser('~/Desktop/sisu_task_result.json')
+    with open(result_file, 'r') as f:
+        data = f.read()
+        return json.loads(data)
+
+
 def get_hash(filepath):
     import hashlib
     sha = hashlib.sha256()
@@ -38,7 +52,14 @@ def handle_file_tree_update(message):
 
 def handle_file_test(message):
     filename = message['payload']['filename']
-    subprocess.call('cscript test.vbs "{f}"'.format(f=filename))
+    tests = message['payload']['tests']
+    
+    save_rhino_task_file({
+        'tests': tests,
+    })
+    subprocess.call('cscript run.vbs "{f}"'.format(f=filename))
+
+    return read_rhino_result_file()
 
 
 def handle_message(message):
