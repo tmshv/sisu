@@ -265,15 +265,19 @@ def test_layer_name_match(options):
     ptr = re.compile(options['regexp'])
     ignore = options['ignore']
 
+    failed_layers = []
     s = True
     for x in sc.doc.Layers:
         name = x.Name
         ignored = name in ignore
 
         if not ignored and not ptr.match(name):
-            log('Not match: {}'.format(name))
+            failed_layers.append(name)
             s = False
-    return s
+    x = {
+        'failedLayers': failed_layers,
+    }
+    return s, x
 
 
 def test_is_curve_planar(options):
@@ -282,8 +286,8 @@ def test_is_curve_planar(options):
     objs = get_geometry_by_layer(layer_name)
     for x in objs:
         if not rs.IsCurvePlanar(x.Id):
-            return False
-    return True
+            return False, None
+    return True, None
 
 
 def test_is_polyline(options):
@@ -292,8 +296,8 @@ def test_is_polyline(options):
     objs = get_geometry_by_layer(layer_name)
     for x in objs:
         if not rs.IsPolyline(x.Id):
-            return False
-    return True
+            return False, None
+    return True, None
 
 
 def test_layer_exist(options):
@@ -302,33 +306,35 @@ def test_layer_exist(options):
 
     for name in get_layer_names():
         if ptr.match(name):
-            return get_test_response(options, None, True)
-    return get_test_response(options, None, False)
+            return True, None
+    return False, None
 
 
 def test_is_layer_empty(options):
     layer_name = options['layer']
 
-    return rs.IsLayer(layer_name) and rs.IsLayerEmpty(layer_name)
+    s = rs.IsLayer(layer_name) and rs.IsLayerEmpty(layer_name)
+    return s, None
 
 
 def test_is_layer_not_empty(options):
     layer_name = options['layer']
 
-    return rs.IsLayer(layer_name) and not rs.IsLayerEmpty(layer_name)
+    s = rs.IsLayer(layer_name) and not rs.IsLayerEmpty(layer_name)
+    return s, None
 
 
 def test_is_curve_closed(options):
     layer_name = options['layer']
     geom = get_geometry_by_layer(layer_name)
     if len(geom) == 0:
-        return None
+        return None, None
 
     for x in geom:
         valid = rs.IsCurveClosed(x)
         if not valid:
-            return False
-    return True
+            return False, None
+    return True, None
 
 
 def test_layer_consistency(options):
@@ -337,8 +343,8 @@ def test_layer_consistency(options):
     for x in get_objects_by_layer(layer_name):
         t = get_object_type(x)
         if t not in types:
-            return False
-    return True
+            return False, None
+    return True, None
 
 
 def test_block_name(options):
@@ -348,9 +354,9 @@ def test_block_name(options):
         name = rs.BlockInstanceName(x.Id)
         pattern = '^{layer}'.format(layer=layer_name)
         if not re.match(pattern, name):
-            return False
+            return False, None
 
-    return True
+    return True, None
 
 
 def open_file(path):
@@ -382,7 +388,7 @@ def run_task(task):
     task_output = {
         'runStart': task.date.strftime("%d.%m.%Y %H:%M:%S"),
         'appName': Rhino.RhinoApp.Name,
-        'appVersion': Rhino.RhinoApp.Version,
+        'appVersion': str(Rhino.RhinoApp.Version),
         'tests': [],
     }
     file_failed = False
@@ -392,18 +398,19 @@ def run_task(task):
     task.generate_tests(layer_names)
 
     for test_data in task.test():
+        print('run test', test_data['name'])
         test_fn = test_factory(test_data)
         if not test_fn:
             task_output['tests'].append({
                 'error': 'cannot handle test'
             })
             continue
-        test_result = test_fn(test_data)
+        test_status, test_payload = test_fn(test_data)
+        test_result = get_test_response(test_data, test_payload, test_status)
         task_output['tests'].append(test_result)
     if not file_failed:
         log('File status: passed')
 
-    task_output['log'] = log_data
     return task_output
 
 
