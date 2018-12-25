@@ -4,15 +4,20 @@ from glob import glob
 import subprocess
 
 
+def resolve_filepath(filepath):
+    x = os.path.expanduser(filepath)
+    return os.path.normpath(x)
+
+
 def save_rhino_task_file(task):
-    task_file = os.path.expanduser('~/Desktop/sisu_task.json')
+    task_file = resolve_filepath('~/Desktop/sisu_task.json')
     with open(task_file, 'w') as f:
         data = json.dumps(task, indent=4, ensure_ascii=False)
         f.write(data)
 
 
 def read_rhino_result_file():
-    result_file = os.path.expanduser('~/Desktop/sisu_task_result.json')
+    result_file = resolve_filepath('~/Desktop/sisu_task_result.json')
     with open(result_file, 'r') as f:
         data = f.read()
         return json.loads(data)
