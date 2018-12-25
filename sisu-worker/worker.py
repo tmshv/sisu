@@ -29,7 +29,7 @@ def callback(ch, method, props, body):
         print(e)
 
 
-if __name__ == '__main__':
+def main():
     queue = 'sisu'
     host = sys.argv[1]
     port = int(sys.argv[2])
@@ -42,3 +42,10 @@ if __name__ == '__main__':
     print('Waiting for messages. To exit press CTRL+C')
     channel.basic_consume(callback, queue=queue)
     channel.start_consuming()
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit()
