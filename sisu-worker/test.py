@@ -20,6 +20,7 @@ TOKEN = None
 
 log_data = []
 
+
 def norm_task_layer_patterns(layers):
     if isinstance(layers, list):
         return layers
@@ -27,6 +28,7 @@ def norm_task_layer_patterns(layers):
         [layers]
     else:
         return []
+
 
 class Task:
     def __init__(self, tests):
@@ -401,7 +403,7 @@ def run_task(task):
     log('')
 
     file_failed = False
-    
+
     layer_names = get_layer_names()
     task.generate_tests(layer_names)
 
