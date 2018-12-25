@@ -15,10 +15,12 @@ def callback(ch, method, props, body):
         result = core.handle_message(msg)
         body = json.dumps(result)
         properties = pika.BasicProperties(correlation_id=props.correlation_id)
-        ch.basic_publish(exchange='',
-                        routing_key=props.reply_to,
-                        properties=properties,
-                        body=body)
+        ch.basic_publish(
+            exchange='',
+            routing_key=props.reply_to,
+            properties=properties,
+            body=body
+        )
         ch.basic_ack(delivery_tag=method.delivery_tag)
 
         print('< Result', result)
