@@ -451,9 +451,12 @@ def get_task_data():
 
 
 def save_task_result():
+    result = {
+        'log': '\n'.join(log_data),
+    }
     result_file = os.path.expanduser('~/Desktop/sisu_task_result.json')
     with open(result_file, 'w') as f:
-        data = json.dumps(log_data, ensure_ascii=False)
+        data = json.dumps(result, ensure_ascii=False, indent=4)
         f.write(data)
 
 
@@ -461,6 +464,7 @@ def main():
     task = get_task_data()
     task = Task(tests=task['tests'])
     run_task(task)
+    save_task_result()
 
 
 main()
