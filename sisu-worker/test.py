@@ -48,6 +48,7 @@ def get_test_response(options, payload, status):
     return {
         'status': get_test_status(status),
         'name': options['name'],
+        'options': options,
         'payload': payload,
     }
 
