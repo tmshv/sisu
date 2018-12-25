@@ -4,6 +4,10 @@ from glob import glob
 import subprocess
 
 
+def get_test_script_path():
+    return os.path.join(os.getcwd(), 'test.py')
+
+
 def resolve_filepath(filepath):
     x = os.path.expanduser(filepath)
     return os.path.normpath(x)
@@ -18,6 +22,9 @@ def save_rhino_task_file(task):
 
 def read_rhino_result_file():
     result_file = resolve_filepath('~/Desktop/sisu_task_result.json')
+    if not os.path.isfile(result_file):
+        return None
+
     with open(result_file, 'r') as f:
         data = f.read()
         return json.loads(data)
@@ -56,13 +63,14 @@ def handle_file_tree_update(message):
 
 
 def handle_file_test(message):
+    testfile = get_test_script_path()
     filename = message['payload']['filename']
     tests = message['payload']['tests']
     
     save_rhino_task_file({
         'tests': tests,
     })
-    subprocess.call('cscript run.vbs "{f}"'.format(f=filename))
+    subprocess.call('cscript run.vbs "{f}" "{t}"'.format(f=filename, t=testfile))
 
     return read_rhino_result_file()
 
