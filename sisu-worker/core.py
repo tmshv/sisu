@@ -68,9 +68,10 @@ def handle_file_test(message):
     tests = message['payload']['tests']
     
     save_rhino_task_file({
+        'filename': filename,
         'tests': tests,
     })
-    subprocess.call('cscript run.vbs "{f}" "{t}"'.format(f=filename, t=testfile))
+    subprocess.call('cscript run.vbs "{t}"'.format(t=testfile))
 
     return read_rhino_result_file()
 

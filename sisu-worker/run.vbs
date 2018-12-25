@@ -2,10 +2,9 @@
 
 Sub RunAutomation
     ' Declare local variables
-    Dim objRhino, objRhinoScript, objShell, filename, testfile
+    Dim objRhino, objRhinoScript, objShell, runfile
     
-    filename = Wscript.Arguments.Item(0)
-    testfile = Wscript.Arguments.Item(1)
+    runfile = Wscript.Arguments.Item(0)
 
     ' Create a Rhino application object
     On Error Resume Next
@@ -19,12 +18,8 @@ Sub RunAutomation
 
     WScript.Sleep(500)
 
-    Call objRhino.RunScript("_-Open " & filename, 0)
-    Call objRhino.RunScript("_-Open " & testfile, 0)
-    ' Call objRhino.RunScript("_-RunPythonScript ""D:\Autorhino\test.py""", 0)
-    ' Call objRhino.RunScript("_-RunPythonScript ""test.py""", 0)
-
-    Call WScript.Echo("Done!")   
+    Call objRhino.RunScript("_-RunPythonScript " & runfile, 0)
+    Call WScript.Echo("Done!")
 End Sub
 
 Call RunAutomation

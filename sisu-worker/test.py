@@ -462,9 +462,13 @@ def save_task_result():
 
 def main():
     task = get_task_data()
+    filename = task['filename']
+    open_file(filename)
     task = Task(tests=task['tests'])
     run_task(task)
     save_task_result()
+    rs.DocumentModified(False)
+    rs.Exit()
 
 
 main()
