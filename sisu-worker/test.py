@@ -20,6 +20,13 @@ TOKEN = None
 
 log_data = []
 
+def norm_task_layer_patterns(layers):
+    if isinstance(layers, list):
+        return layers
+    elif isinstance(layers, str):
+        [layers]
+    else:
+        return []
 
 class Task:
     def __init__(self, tests):
@@ -46,14 +53,6 @@ class Task:
 
             return [x for x in layers if x not in ignore]
 
-        def get_layer_patterns(layers):
-            if isinstance(layers, list):
-                return layers
-            elif isinstance(layers, str):
-                [layers]
-            else:
-                return []
-
         def split_tests(tests):
             def t(test, layer):
                 t = copy(test)
@@ -66,11 +65,11 @@ class Task:
                     result.append(test)
                     continue
 
-                layer_patterns_ignore = get_layer_patterns(
-                    test.get('ignore', []))
-                layer_patterns = get_layer_patterns(test['layer'])
-                layers = collect_layers(
-                    layer_patterns, layer_patterns_ignore)
+                ignore = test.get('ignore', [])
+                ignore = norm_task_layer_patterns(ignore)
+                layer_patterns = test.get('layer', [])
+                layer_patterns = norm_task_layer_patterns(layer_patterns)
+                layers = collect_layers(layer_patterns, ignore)
                 result += [t(test, x) for x in layers]
             return result
 
