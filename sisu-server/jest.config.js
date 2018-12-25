@@ -4,15 +4,21 @@ module.exports = {
 			tsConfigFile: 'tsconfig.json'
 		}
 	},
+	roots: [
+		'src',
+	],
+	collectCoverageFrom: [
+		'src/**/*.ts'
+	],
 	moduleFileExtensions: [
 		'ts',
 		'js'
 	],
 	transform: {
-		'^.+\\.(ts|tsx)$': './node_modules/ts-jest/preprocessor.js'
+		'^.+\\.(ts|tsx)$': 'ts-jest',
 	},
 	testMatch: [
-		'**/test/**/*.test.(ts|js)'
+		'**/*.test.(ts|js)'
 	],
 	testEnvironment: 'node'
 };

@@ -14,11 +14,15 @@
         "paths": {
             "*": [
                 "node_modules/*",
-                "src/types/*"
+                "src/typings/*"
             ]
         }
     },
     "include": [
         "src/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
     ]
 }
