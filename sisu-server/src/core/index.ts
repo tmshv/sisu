@@ -27,6 +27,7 @@ export interface IProjectFile {
 }
 
 export interface IFileMetadata {
+    fileId: string;
     file: string;
     hash: string;
     type: string;

@@ -5,6 +5,7 @@ import { IProjectFile, IProjectState } from "../core";
 import { createProjectInfo } from "../core/factory";
 import { findProject } from "../data/project";
 import { normalizePath } from "../util";
+import { createFileId } from "../core/lib/file";
 
 function array<T>(maybeArray?: Array<T>): Array<T> {
     return Array.isArray(maybeArray)
@@ -248,6 +249,11 @@ export function updateProjectState(db: Db) {
         const projects = db.collection("projects");
         const projectId = req.params.id;
         const state = req.body as IProjectState;
+
+        state.files = state.files.map(x => ({
+            ...x,
+            fileId: createFileId(x.file),
+        }));
 
         const project = await findProject(db, projectId);
 
