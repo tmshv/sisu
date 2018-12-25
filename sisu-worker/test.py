@@ -12,13 +12,44 @@ import rhinoscriptsyntax as rs
 import scriptcontext as sc
 import Rhino
 
-TEST_PASSED = 0
-TEST_FAILED = 1
-TEST_SKIPPED = 2
+TEST_PASSED = 'pass'
+TEST_FAILED = 'fail'
+TEST_SKIPPED = 'skip'
 
 TOKEN = None
 
 log_data = []
+
+
+def get_task_error(error):
+    return {
+        'status': 'failed',
+        'error': 'error'
+    }
+
+
+def get_task_response(payload):
+    return {
+        'status': 'ok',
+        'payload': payload,
+    }
+
+
+def get_test_status(status):
+    if status == None:
+        return TEST_SKIPPED
+    elif status == False:
+        return TEST_FAILED
+    elif status == True:
+        return TEST_PASSED
+
+
+def get_test_response(options, payload, status):
+    return {
+        'status': get_test_status(status),
+        'name': options['name'],
+        'payload': payload,
+    }
 
 
 def norm_task_layer_patterns(layers):
@@ -32,11 +63,9 @@ def norm_task_layer_patterns(layers):
 
 class Task:
     def __init__(self, tests):
-        self.date = datetime.now()
-        self.status = True
-        self._tests = []
-
         self.tests = tests
+        self.date = datetime.now()
+        self._tests = []
 
     def generate_tests(self, layer_names):
         def get_layers_match(pattern):
@@ -77,14 +106,6 @@ class Task:
 
         self._tests = split_tests(self.tests)
         return self._tests
-
-    def get_status(self):
-        return self.status
-
-    def update_status(self, value):
-        if not self.status:
-            return
-        self.status = value
 
     def test(self):
         for x in self._tests:
@@ -198,11 +219,6 @@ def log(data):
     log_data.append(data)
 
 
-def clear_log():
-    global log_data
-    log_data = []
-
-
 def get_layer(name):
     layer = sc.doc.Layers.FindByFullPath(name, True)
     if layer >= 0:
@@ -286,8 +302,8 @@ def test_layer_exist(options):
 
     for name in get_layer_names():
         if ptr.match(name):
-            return True
-    return False
+            return get_test_response(options, None, True)
+    return get_test_response(options, None, False)
 
 
 def test_is_layer_empty(options):
@@ -339,110 +355,56 @@ def test_block_name(options):
 
 def open_file(path):
     rs.DocumentModified(False)
-    rs.Command('_-Open "{}" _Enter'.format(path))
+    return rs.Command('_-Open "{}" _Enter'.format(path))
 
 
 def test_factory(test):
     name = test['name']
-
-    def default_description(x): return x['name']
-
-    d = {
-        'layerExist':       [test_layer_exist, lambda x: 'Test: layer {mask} should exist'.format(**x)],
-        'emptyLayer':       [test_is_layer_empty,     default_description],
-        'notEmptyLayer':    [test_is_layer_not_empty, default_description],
-        'geometryClosed':   [test_is_curve_closed, lambda x: 'Curves on layer {layer} should be closed'.format(**x)],
-        'layerConsistency': [test_layer_consistency, lambda x: 'Geometry on layer {layer} should be one of type: {types}'.format(layer=x['layer'], types=','.join(x['types']))],
-        'isCurvePlanar':    [test_is_curve_planar,    default_description],
-        'isPolyline':       [test_is_polyline,        default_description],
-        'layerNameMatch':   [test_layer_name_match,   default_description],
-        'blockNameRelation': [test_block_name, lambda x: 'Block name on layer {layer} should start with {layer}'.format(**x)],
+    test_definition = {
+        'layerExist':       test_layer_exist,
+        'emptyLayer':       test_is_layer_empty,
+        'notEmptyLayer':    test_is_layer_not_empty,
+        'geometryClosed':   test_is_curve_closed,
+        'layerConsistency': test_layer_consistency,
+        'isCurvePlanar':    test_is_curve_planar,
+        'isPolyline':       test_is_polyline,
+        'layerNameMatch':   test_layer_name_match,
+        'blockNameRelation': test_block_name,
     }
 
-    def s(status):
-        if status == None:
-            return TEST_SKIPPED
-        elif status == False:
-            return TEST_FAILED
-        elif status == True:
-            return TEST_PASSED
+    if name not in test_definition:
+        return None
 
-    class Test:
-        def __init__(self, name, fn, dc):
-            self.name = name
-            self.fn = fn
-            self.dc = dc
-
-        def make_description(self, options):
-            return self.dc(options)
-
-        def run(self, options):
-            status = self.fn(options)
-            self.status = s(status)
-            self.description = self.make_description(options)
-
-        def is_failed(self):
-            return self.status == TEST_FAILED
-
-        def get_status(self):
-            return self.status
-
-        def get_description(self):
-            return self.description
-
-    return Test(name, d[name][0], d[name][1])
+    return test_definition[name]
 
 
 def run_task(task):
-    clear_log()
-
-    log('=' * 30)
-    log('Date: %s' % task.date.strftime("%d.%m.%Y %H:%M:%S"))
-    log('App: %s' % Rhino.RhinoApp.Name)
-    log('App version %s' % Rhino.RhinoApp.Version)
-    log('')
-
+    task_output = {
+        'runStart': task.date.strftime("%d.%m.%Y %H:%M:%S"),
+        'appName': Rhino.RhinoApp.Name,
+        'appVersion': Rhino.RhinoApp.Version,
+        'tests': [],
+    }
     file_failed = False
 
     layer_names = get_layer_names()
+    task_output['layerNames'] = layer_names
     task.generate_tests(layer_names)
 
     for test_data in task.test():
-        test = test_factory(test_data)
-        test.run(test_data)
-
-        if test.is_failed():
-            file_failed = True
-            status = test.get_status()
-
-            log(test.get_description())
-            log(t(status))
-            log('')
-
-            task.update_status(False)
-
-        # log(t(status))
-        # log('')
+        test_fn = test_factory(test_data)
+        if not test_fn:
+            task_output['tests'].append({
+                'error': 'cannot handle test'
+            })
+            continue
+        test_result = test_fn(test_data)
+        task_output['tests'].append(test_result)
     if not file_failed:
         log('File status: passed')
 
-    log('-' * 50)
-    return log_data
-
-
-def write_log(task, content):
-    file = task.get_log_file()
-    d = os.path.dirname(file)
-    if not os.path.exists(d):
-        os.makedirs(d)
-    msg = '\n'.join(log_data)
-    with open(file, 'w') as f:
-        f.write(msg)
-    return True
-
-
-def test_result_factory(name, description, status, log):
-    return {}
+    task_output['log'] = log_data
+    return task_output
 
 
 def get_task_data():
@@ -452,10 +414,7 @@ def get_task_data():
         return json.loads(data)
 
 
-def save_task_result():
-    result = {
-        'log': '\n'.join(log_data),
-    }
+def save_task_result(result):
     result_file = os.path.expanduser('~/Desktop/sisu_task_result.json')
     with open(result_file, 'w') as f:
         data = json.dumps(result, ensure_ascii=False, indent=4)
@@ -465,10 +424,18 @@ def save_task_result():
 def main():
     task = get_task_data()
     filename = task['filename']
-    open_file(filename)
+    filename = os.path.normpath(filename)
+    s = open_file(filename)
+
+    if not s:
+        task_result = get_task_error('cannot open file {}'.format(filename))
+        save_task_result(task_result)
+        return
+
     task = Task(tests=task['tests'])
-    run_task(task)
-    save_task_result()
+    task_result = run_task(task)
+    save_task_result(task_result)
+
     rs.DocumentModified(False)
     rs.Exit()
 
