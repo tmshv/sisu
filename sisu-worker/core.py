@@ -63,14 +63,8 @@ def handle_file_tree_update(message):
 
 
 def handle_file_test(message):
-    testfile = get_test_script_path()
-    filename = message['payload']['filename']
-    tests = message['payload']['tests']
-    
-    save_rhino_task_file({
-        'filename': filename,
-        'tests': tests,
-    })
+    testfile = get_test_script_path()   
+    save_rhino_task_file(message['payload'])
     subprocess.call('cscript run.vbs "{t}"'.format(t=testfile))
 
     return read_rhino_result_file()
