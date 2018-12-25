@@ -8,7 +8,7 @@ RUN npm ci
 
 COPY tsconfig.json tslint.json jest.config.js ./
 COPY src ./src
-RUN npm test
+RUN npm run test-build
 RUN npm run build
 
 
