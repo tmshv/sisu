@@ -77,7 +77,6 @@
     "@types/winston": "^2.3.7",
     "jest": "^22.0.4",
     "ts-jest": "^22.0.4",
-    "chai": "^4.1.2",
     "concurrently": "^3.5.1",
     "nodemon": "^1.18.9",
     "shelljs": "^0.8.1",

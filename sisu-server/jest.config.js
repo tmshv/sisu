@@ -8,7 +8,8 @@ module.exports = {
 		'src',
 	],
 	collectCoverageFrom: [
-		'src/**/*.ts'
+		'src/**/*.ts',
+		'!src/typings/*',
 	],
 	moduleFileExtensions: [
 		'ts',

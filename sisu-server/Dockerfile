@@ -7,7 +7,6 @@ RUN npm i -g --upgrade npm
 RUN npm ci
 
 COPY tsconfig.json tslint.json jest.config.js ./
-COPY test ./test
 COPY src ./src
 RUN npm run build
 
