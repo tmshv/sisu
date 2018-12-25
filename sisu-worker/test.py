@@ -338,6 +338,20 @@ def test_is_curve_closed(options):
     return True, None
 
 
+def test_is_curve_not_selfintersected(options):
+    layer_name = options['layer']
+    intersects = []
+    geom = get_geometry_by_layer(layer_name)
+    if len(geom) == 0:
+        return None, intersects
+
+    for x in geom:
+        xs = rs.CurveCurveIntersection(x)
+        if xs:
+            intersects.append(x.Name)
+    return len(intersects) == 0, intersects
+
+
 def test_layer_consistency(options):
     layer_name = options['layer']
     types = options['types']
@@ -372,6 +386,7 @@ def test_factory(test):
         'emptyLayer':       test_is_layer_empty,
         'notEmptyLayer':    test_is_layer_not_empty,
         'geometryClosed':   test_is_curve_closed,
+        'curveNotSelfIntersected': test_is_curve_not_selfintersected,
         'layerConsistency': test_layer_consistency,
         'isCurvePlanar':    test_is_curve_planar,
         'isPolyline':       test_is_polyline,
