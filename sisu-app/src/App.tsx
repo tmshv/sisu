@@ -10,60 +10,60 @@ import { UserContext } from './context';
 import './App.css';
 
 interface IState {
-  init: boolean;
-  user: any;
+    init: boolean;
+    user: any;
 }
 
 class App extends React.Component<{}, IState, any> {
-  public state = {
-    init: false,
-    user: null,
-  }
-
-  public componentDidMount() {
-    getRequest('/user')
-      .then(res => {
-        if (res.status !== 200) {
-          throw new Error("User no authorized");
-        }
-
-        return res.json()
-      })
-      .then(res => {
-        this.setState({
-          init: true,
-          user: res.resource,
-        });
-      })
-      .catch(err => {
-        this.setState({
-          init: true,
-        });
-      })
-  }
-
-  public render() {
-    if (!this.state.init) {
-      return null;
+    public state = {
+        init: false,
+        user: null,
     }
 
-    return (
-      <UserContext.Provider value={{
-        user: this.state.user,
-      }}>
-        <Router>
-          <div className={"App"}>
-            <Switch>
-              <Route exact={true} path="/" component={PageHome} />
-              <Route path="/login" component={PageLogin} />
-              <Route path="/project/:id/config" component={PageProjectConfig} />
-              <Route path="/project/:id" component={PageProject} />
-            </Switch>
-          </div>
-        </Router>
-      </UserContext.Provider>
-    );
-  }
+    public componentDidMount() {
+        getRequest('/user')
+            .then(res => {
+                if (res.status !== 200) {
+                    throw new Error("User no authorized");
+                }
+
+                return res.json()
+            })
+            .then(res => {
+                this.setState({
+                    init: true,
+                    user: res.resource,
+                });
+            })
+            .catch(err => {
+                this.setState({
+                    init: true,
+                });
+            })
+    }
+
+    public render() {
+        if (!this.state.init) {
+            return null;
+        }
+
+        return (
+            <UserContext.Provider value={{
+                user: this.state.user,
+            }}>
+                <Router>
+                    <div className={"App"}>
+                        <Switch>
+                            <Route exact={true} path="/" component={PageHome} />
+                            <Route path="/login" component={PageLogin} />
+                            <Route path="/project/:id/config" component={PageProjectConfig} />
+                            <Route path="/project/:id" component={PageProject} />
+                        </Switch>
+                    </div>
+                </Router>
+            </UserContext.Provider>
+        );
+    }
 }
 
 export default App;
