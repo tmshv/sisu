@@ -1,8 +1,14 @@
+interface File {
+    file: string;
+    fileId: string;
+    type: string;
+}
+
 export interface IProjectInfo {
     name: string;
     id: string;
     uri: string;
-    files: string[];
+    files: File[];
 }
 
 export interface IExternalUser {
