@@ -2,8 +2,9 @@
 FROM node:10 as build
 WORKDIR /app
 
+RUN npm i -g --upgrade npm
 COPY package.json package-lock.json ./
-RUN npm i
+RUN npm ci
 
 COPY . ./
 RUN npm run build
