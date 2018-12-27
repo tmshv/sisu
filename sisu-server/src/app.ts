@@ -16,6 +16,7 @@ import * as authController from "./controllers/auth";
 import * as userController from "./controllers/user";
 import * as projectController from "./controllers/project";
 import * as fileController from "./controllers/file";
+import * as utilsController from "./controllers/utils";
 import { createProjectInfo } from "./core/factory";
 import { ENVIRONMENT } from "./util/secrets";
 
@@ -65,6 +66,8 @@ export function createServer(db: Db): Application {
       resource,
     }));
   });
+
+  app.get("/utils/create-project-file-id", utilsController.getProjectFileId());
 
   app.get("/projects/:id", isAuthenticated, projectController.getProject(db));
   app.get("/projects/:id/info", isAuthenticated, projectController.getProjectInfo(db));
