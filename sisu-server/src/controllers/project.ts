@@ -301,11 +301,14 @@ export function updateProjectState(db: Db) {
 
         const scopeFiles = array(state.files);
 
-        let files = array(project.files);
-        files = files.filter(x => {
-            const filename = x.filename;
-            return scopeFiles.find(f => f.file === filename);
-        });
+        const files = array(scopeFiles).map(x => ({
+            fileId: x.fileId,
+            filename: x.file,
+            log: "",
+            tests: [],
+            previewImageUrl: "",
+            lastScanTs: 1,
+        }));
 
         try {
             await projects.updateOne({ _id: project._id }, {
