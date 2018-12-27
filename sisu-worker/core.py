@@ -2,6 +2,7 @@ import os
 import json
 from glob import glob
 import subprocess
+from api import api_init, api_set_project_file_tests
 
 
 def get_test_script_path():
@@ -63,11 +64,23 @@ def handle_file_tree_update(message):
 
 
 def handle_file_test(message):
+    payload = message['payload']
+    api_init(payload['token'])
     testfile = get_test_script_path()   
-    save_rhino_task_file(message['payload'])
+    save_rhino_task_file(payload)
     subprocess.call('cscript run.vbs "{t}"'.format(t=testfile))
 
-    return read_rhino_result_file()
+    result = read_rhino_result_file()
+
+    tests = result['tests']
+    res = api_set_project_file_tests(payload['projectId'], payload['fileId'], tests)
+    if res.status_code == 200:
+        print('> set result')
+    else:
+        print(f'> failed {res.status_code}')
+        print(res.json())
+
+    return result
 
 
 def handle_message(message):
