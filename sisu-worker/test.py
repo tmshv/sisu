@@ -212,10 +212,6 @@ def api_project_update_file(project_id, filename, log_list):
     print(log)
 
 
-def load_settings():
-    return json.load(open('settings.json', 'rb'))
-
-
 def log(data):
     log_data.append(data)
 
