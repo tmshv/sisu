@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Db } from "mongodb";
 import { success, error, resource } from "../lib/api";
-import { IProjectFile, IProjectState } from "../core";
+import { IProjectFile, IProjectState, IFileTest } from "../core";
 import { createProjectInfo } from "../core/factory";
 import { findProject } from "../data/project";
 import { normalizePath } from "../util";
@@ -53,15 +53,8 @@ export function getProjectInfo(db: Db) {
 
 export function getProjectFile(db: Db) {
     return async (req: Request, res: Response) => {
-        const projectId = req.params.id;
-        const filename = req.query.file;
-
-        if (!filename) {
-            res.status(400);
-            return res.json(error({
-                message: "Filename required as query 'file'",
-            }));
-        }
+        const projectId = req.params.projectId;
+        const fileId = req.params.fileId;
 
         const project = await findProject(db, projectId);
 
@@ -72,12 +65,12 @@ export function getProjectFile(db: Db) {
             }));
         }
 
-        const resource = project.files.find(x => filename === normalizePath(x.filename));
+        const resource = project.files.find(x => x.fileId === fileId);
 
         if (!resource) {
             res.status(404);
             return res.json(error({
-                message: `Project ${projectId} does'nt contains file ${filename}`,
+                message: `Project ${projectId} does'nt contains file ${fileId}`,
             }));
         }
 
@@ -91,7 +84,9 @@ export function setProjectFile(db: Db) {
     return async (req: Request, res: Response) => {
         const projects = db.collection("projects");
         const projectId = req.params.id;
+        const fileId = req.params.fileId;
         const file = req.body as IProjectFile;
+        file.fileId = fileId;
 
         const project = await findProject(db, projectId);
 
@@ -103,8 +98,48 @@ export function setProjectFile(db: Db) {
         }
 
         let files = array(project.files) as IProjectFile[];
-        files = files.filter(x => file.filename !== normalizePath(x.filename));
+        files = files.filter(x => x.fileId !== fileId);
         files = [...files, file];
+
+        try {
+            await projects.updateOne({ _id: project._id }, {
+                $set: {
+                    files,
+                }
+            });
+
+            res.json(success());
+        } catch (e) {
+            res.json(error(e));
+        }
+    };
+}
+
+export function setProjectFileTests(db: Db) {
+    return async (req: Request, res: Response) => {
+        const projects = db.collection("projects");
+        const projectId = req.params.id;
+        const fileId = req.params.fileId;
+        const tests = req.body as IFileTest[];
+
+        const project = await findProject(db, projectId);
+
+        if (!project) {
+            res.status(404);
+            return res.json(error({
+                message: `Project ${projectId} not found`,
+            }));
+        }
+
+        const files = array(project.files)
+            .map(file => {
+                if (file.fileId !== fileId) {
+                    return file;
+                }
+
+                file.tests = tests;
+                return file;
+            });
 
         try {
             await projects.updateOne({ _id: project._id }, {

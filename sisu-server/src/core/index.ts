@@ -20,10 +20,19 @@ export interface IProject {
 }
 
 export interface IProjectFile {
+    fileId: string;
     filename: string;
     log: object;
+    tests: IFileTest[];
     previewImageUrl: string;
     lastScanTs: number;
+}
+
+export interface IFileTest {
+    name: string;
+    status: string;
+    options: any;
+    payload: any;
 }
 
 export interface IFileMetadata {

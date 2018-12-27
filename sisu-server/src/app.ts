@@ -69,8 +69,9 @@ export function createServer(db: Db): Application {
   app.get("/projects/:id", isAuthenticated, projectController.getProject(db));
   app.get("/projects/:id/info", isAuthenticated, projectController.getProjectInfo(db));
 
-  app.get("/projects/:id/file", isAuthenticated, projectController.getProjectFile(db));
-  app.put("/projects/:id/file", isAuthenticated, projectController.setProjectFile(db));
+  app.get("/projects/:projectId/file/:fileId", isAuthenticated, projectController.getProjectFile(db));
+  app.put("/projects/:projectId/file/:fileId", isAuthenticated, projectController.setProjectFile(db));
+  app.put("/projects/:projectId/file/:fileId/tests", isAuthenticated, projectController.setProjectFileTests(db));
 
   app.get("/projects/:id/config", isAuthenticated, projectController.getProjectConfig(db));
   app.get("/projects/:id/config/input", isAuthenticated, projectController.getProjectConfigInput(db));
