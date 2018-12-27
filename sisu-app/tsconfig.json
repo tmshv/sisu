@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "outDir": "build/dist",
     "module": "esnext",
-    "target": "es5",
+    "target": "es2018",
     "lib": ["es6", "dom"],
     "sourceMap": true,
     "allowJs": true,
@@ -17,6 +17,8 @@
     "importHelpers": true,
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "noUnusedLocals": true
   },
   "exclude": [
