@@ -21,7 +21,6 @@ export function node(name: string, nodes: ITreeNode[]): ITreeNode {
 
 export function treeFromFlat(files: string[]): ITreeNode {
     const flat = createFlat(files)
-    // return flat
     const nest = new FlatToNested({
         children: 'nodes',
         id: 'id',
