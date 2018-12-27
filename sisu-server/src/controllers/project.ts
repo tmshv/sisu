@@ -118,7 +118,7 @@ export function setProjectFile(db: Db) {
 export function setProjectFileTests(db: Db) {
     return async (req: Request, res: Response) => {
         const projects = db.collection("projects");
-        const projectId = req.params.id;
+        const projectId = req.params.projectId;
         const fileId = req.params.fileId;
         const tests = req.body as IFileTest[];
 
