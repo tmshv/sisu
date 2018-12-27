@@ -74,11 +74,7 @@ def handle_file_test(message):
 
     tests = result['tests']
     res = api_set_project_file_tests(payload['projectId'], payload['fileId'], tests)
-    if res.status_code == 200:
-        print('> set result')
-    else:
-        print(f'> failed {res.status_code}')
-        print(res.json())
+    print(res)
 
     return result
 

@@ -33,11 +33,11 @@ def request_put(url, data):
     })
 
     res = requests.put(url, data=data, headers=headers)
+    print(res.status_code)
 
     if res.status_code == 200:
         return res.json()
 
-    print(res.status_code)
     return None
 
 
