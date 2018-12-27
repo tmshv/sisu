@@ -3,7 +3,7 @@
 }
 
 .TreeNode {
-    --nodes-shift: 20px;
+    --nodes-shift: 10px;
 
     display: flex;
     flex-direction: column;
