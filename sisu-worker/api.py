@@ -2,13 +2,14 @@ import requests
 
 TOKEN = None
 
+
 def api_init(token):
     global TOKEN
     TOKEN = token
 
 
 def api_url(path):
-    return 'http://sisu.unit4.io/api{path}'.format(path=path)
+    return f'http://sisu.unit4.io/api{path}'
 
 
 def request_headers(custom_headers):
@@ -28,15 +29,16 @@ def request_headers(custom_headers):
 
 
 def request_put(url, data):
+    print(f'> Req {url}')
     headers = request_headers({
         'Content-Type': 'application/json',
     })
 
-    res = requests.put(url, data=data, headers=headers)
-    print(res.status_code)
-
-    if res.status_code == 200:
-        return res.json()
+    try:
+        res = requests.put(url, json=data, headers=headers)
+        print(res.status_code)
+    except Exception as e:
+        print(e)
 
     return None
 
@@ -48,7 +50,7 @@ def request_put(url, data):
 
 
 def api_set_project_file_tests(project_id, file_id, tests):
-    url = api_url(f'/project/{project_id}/file/{file_id}/tests')
+    url = api_url(f'/projects/{project_id}/file/{file_id}/tests')
     return request_put(url, tests)
 
 
