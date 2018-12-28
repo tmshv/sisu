@@ -65,8 +65,11 @@ def handle_file_tree_update(message):
 
 def handle_file_test(message):
     payload = message['payload']
+    filename = payload['filename']
 
-    if not os.path.isfile(payload['filename']):
+    print(f'> testing {filename}')
+
+    if not os.path.isfile(filename):
         return {
             'error': 'file not found',
         }
