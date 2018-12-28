@@ -75,7 +75,7 @@ export default class PageLogin extends React.Component<IProps, IState, any> {
         }
 
         this.setState({
-            loading: true
+            loading: true,
         }, () => {
             postRequest("/login", data)
                 .then(res => {
