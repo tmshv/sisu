@@ -65,6 +65,12 @@ def handle_file_tree_update(message):
 
 def handle_file_test(message):
     payload = message['payload']
+
+    if not os.path.isfile(payload['filename']):
+        return {
+            'error': 'file not found',
+        }
+
     api_init(payload['token'])
     testfile = get_test_script_path()   
     save_rhino_task_file(payload)
