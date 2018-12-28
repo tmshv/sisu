@@ -30,7 +30,11 @@
 
 ```js
 {
-    type: "",
+    name: String,
+    mask?: String,
+    layer?: String,
+    ignore?: String[],
+    types?: String[],
 }
 ```
 
@@ -95,7 +99,7 @@ Response:
 
 ### FILE.TEST
 
-Test file. Save result with with `/api/v1/projects/<>/file`
+Test file with test suite.
 
 Request:
 
@@ -112,7 +116,13 @@ Request:
 Response:
 
 ```js
-null
+[
+    {
+        ok: boolean,
+        result: any,
+        test: any,
+    },
+]
 ```
 
 ### FILE.UPDATE_PREVIEW
