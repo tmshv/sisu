@@ -336,9 +336,10 @@ def get_task_data():
 
 def save_task_result(result):
     result_file = os.path.expanduser('~/Desktop/sisu_task_result.json')
-    with open(result_file, 'w') as f:
+    with open(result_file, 'wb') as f:
         data = json.dumps(result, ensure_ascii=False, indent=4)
-        f.write(data)
+        d = data.encode('utf-8')
+        f.write(d)
 
 
 def main():
