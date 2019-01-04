@@ -307,7 +307,7 @@ def run_task(task):
     file_failed = False
 
     layer_names = get_layer_names()
-    task_output['layerNames'] = layer_names
+    #task_output['layerNames'] = layer_names
     task.generate_tests(layer_names)
 
     for test_data in task.test():
