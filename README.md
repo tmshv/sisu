@@ -13,6 +13,7 @@
 ## Links
 
 - [TestRhino6Automation](https://github.com/mcneel/rhino-developer-samples/blob/6/rhinoscript/TestRhino6Automation.vbs)
+- [Rhino3dm JavaScript Sample](https://github.com/mcneel/rhino3dm/blob/master/samples/javascript)
 
 ## Models
 
