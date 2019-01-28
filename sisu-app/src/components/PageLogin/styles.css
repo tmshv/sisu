@@ -7,8 +7,23 @@
     justify-content: center;
 }
 
+.PageLogin button{
+    font-size: 1.5em;
+
+    /* height: 30px; */
+    padding: 10px 15px;
+
+    cursor: pointer;
+}
+
 .PageLogin button:disabled{
-    opacity: 0.5;
+    color: #ccc;
+    cursor: auto;
+}
+
+.PageLogin button:focus {
+    background-color: #f3ff00;
+    outline: none;
 }
 
 .PageLogin form {
@@ -19,9 +34,23 @@
 }
 
 .PageLogin form input {
-    padding: 5px 10px;
+    font-size: 1.5em;
+
+    border: none;
+    border-bottom: 1px solid black;
+
+    padding: 10px 15px;
 
     flex: 1;
+}
+
+.PageLogin form input:focus {
+    background-color: #f3ff00;
+    outline: none;
+}
+
+.PageLogin form input:last-child {
+    /* border: none; */
 }
 
 .PageLogin label{
@@ -37,4 +66,31 @@
     margin-right: 10px;
 
     text-align: right;
+}
+
+.PageLogin form .body {
+    display: flex;
+    flex-direction: column;
+}
+
+/* form style */
+
+.PageLogin form .body {
+    border-top: 7px solid black;
+    border-left: 7px solid black;
+    border-right: 7px solid black;
+}
+
+.PageLogin form .footer {
+    display: flex;
+}
+
+.PageLogin form .submit {
+    border: 7px solid black;
+    border-top: none;
+}
+
+.PageLogin form .spacer {
+    flex: 1;
+    border-top: 7px solid black;
 }

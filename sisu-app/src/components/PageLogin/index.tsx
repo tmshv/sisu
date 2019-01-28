@@ -26,33 +26,33 @@ export default class PageLogin extends React.Component<IProps, IState, any> {
                 <form
                     onSubmit={this.onSubmit}
                 >
-                    <label>
-                        <span>email</span>
+                    <div className={'body'}>
                         <input
                             type="text"
                             value={this.state.email}
                             onChange={this.onChangeEmail}
+                            placeholder={'email'}
                         />
-                    </label>
 
-                    <label>
-                        <span>password</span>
                         <input
                             type="password"
                             value={this.state.password}
                             onChange={this.onChangePassword}
+                            placeholder={'password'}
                         />
-                    </label>
+                    </div>
 
-                    <label>
-                        <span />
-
+                    <div className={'footer'}>
                         <button
+                            className={'submit'}
                             disabled={!this.canLogin}
                         >
-                            Login
+                            login
                         </button>
-                    </label>
+                        <div
+                            className={'spacer'}
+                        />
+                    </div>
                 </form>
             </div>
         );
