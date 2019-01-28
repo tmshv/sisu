@@ -66,6 +66,7 @@ def handle_file_tree_update(message):
 def handle_file_test(message):
     payload = message['payload']
     filename = payload['filename']
+    filename = os.path.normpath(filename)
 
     print(f'> testing {filename}')
 
