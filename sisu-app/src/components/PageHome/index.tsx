@@ -26,9 +26,9 @@ class PageHome extends React.PureComponent<IProps, {}, any> {
     }
 
     private renderBasic = () => (
-        <div>
+        <main>
             <Banner />
-        </div>
+        </main>
     )
 }
 
