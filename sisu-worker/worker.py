@@ -34,8 +34,8 @@ def main():
     queue = 'sisu'
     host = sys.argv[1]
     port = int(sys.argv[2])
-    username = int(sys.argv[3])
-    password = int(sys.argv[4])
+    username = sys.argv[3]
+    password = sys.argv[4]
     credentials=pika.PlainCredentials(username=username, password=password)
     params = pika.ConnectionParameters(
         host=host,
