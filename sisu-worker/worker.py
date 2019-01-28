@@ -30,10 +30,19 @@ def callback(ch, method, props, body):
 
 
 def main():
+    vhost = 'sisu'
     queue = 'sisu'
     host = sys.argv[1]
     port = int(sys.argv[2])
-    params = pika.ConnectionParameters(host, port, '/')
+    username = int(sys.argv[3])
+    password = int(sys.argv[4])
+    credentials=pika.PlainCredentials(username=username, password=password)
+    params = pika.ConnectionParameters(
+        host=host,
+        port=port,
+        virtual_host=vhost,
+        credentials=credentials,
+    )
     connection = pika.BlockingConnection(params)
     channel = connection.channel()
     channel.queue_declare(queue=queue)
