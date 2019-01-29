@@ -5,3 +5,16 @@
 .FileInfo h2 {
     margin-bottom: 10px;
 }
+
+.TestList {
+    width: 100%;
+}
+
+.TestList .TestItem {
+    margin-bottom: 10px;
+    padding: 20px;
+    background-color: #f5f5f5;
+
+    display: flex;
+    justify-content: space-between;
+}

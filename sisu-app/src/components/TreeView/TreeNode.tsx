@@ -1,22 +1,23 @@
 import className from 'classnames';
+import { isFunction } from 'lodash';
 import * as React from 'react';
 import { ITreeNode } from './lib';
 
 import './TreeNode.css'
 
-export interface ITreeNodeProps {
-    node: ITreeNode,
+export interface ITreeNodeProps<T> {
+    node: ITreeNode<T>,
     mix?: string,
-    onFoldChange: (node: ITreeNode) => void,
-    onClick: (event: Event, node: ITreeNode) => void,
+    onFoldChange: (node: ITreeNode<T>) => void,
+    onClick?: (event: Event, node: ITreeNode<T>) => void,
     renderNode(
-        node: ITreeNode,
-        onClick: (event: Event, node: ITreeNode) => void,
-        onFoldChange: (node: ITreeNode) => void,
+        node: ITreeNode<T>,
+        onClick: (event: Event, node: ITreeNode<T>) => void,
+        onFoldChange: (node: ITreeNode<T>) => void,
     ): JSX.Element,
 }
 
-export default class TreeNode extends React.Component<ITreeNodeProps, any, any> {
+export default class TreeNode<T> extends React.Component<ITreeNodeProps<T>, any, any> {
     private get hasContent(): boolean {
         const { node } = this.props
 
@@ -46,7 +47,11 @@ export default class TreeNode extends React.Component<ITreeNodeProps, any, any> 
         )
     }
 
-    private onClick = (event: Event) => this.props.onClick(event, this.props.node)
+    private onClick = (event: Event) => {
+        if (isFunction(this.props.onClick)) {
+            this.props.onClick!(event, this.props.node)
+        }
+    }
 
     private renderNode() {
         return this.props.renderNode(this.props.node, this.onClick, this.props.onFoldChange)

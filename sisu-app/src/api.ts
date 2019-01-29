@@ -1,4 +1,15 @@
 import * as qs from "querystring";
+import { IFile, IProjectInfo } from './core';
+
+export interface IApiResponse {
+    status: "ok" | "failed";
+    resource?: any;
+    error?: any;
+}
+
+export function isResponseOk(response: IApiResponse): boolean {
+    return response.status === "ok";
+}
 
 function getAuthHeaders(): any {
     const token = localStorage.getItem("authToken");
@@ -17,7 +28,7 @@ export function makeRequest(path: string, options: any = {}) {
         headers: {
             ...options.headers,
             ...authHeaders,
-        }
+        },
     })
 }
 
@@ -67,6 +78,38 @@ export function getRequest(path: string, query?: object) {
     return fetch(url, {
         headers: new Headers(authHeaders),
     })
+}
+
+export async function getProjectInfo(pid: string): Promise<IProjectInfo | null> {
+    const url = `/projects/${pid}/info`
+
+    try {
+        const res = await getRequest(url)
+        const data = await res.json() as IApiResponse
+        if (isResponseOk(data)) {
+            return data.resource
+        } else {
+            return null
+        }
+    } catch (e) {
+        return null
+    }
+}
+
+export async function getProjectFile(pid: string, fid: string): Promise<IFile | null> {
+    const url = `/projects/${pid}/file/${fid}`
+
+    try {
+        const res = await getRequest(url)
+        const data = await res.json() as IApiResponse
+        if (isResponseOk(data)) {
+            return data.resource
+        } else {
+            return null
+        }
+    } catch (e) {
+        return null
+    }
 }
 
 function buildUrl(url: string, query?: object): string {

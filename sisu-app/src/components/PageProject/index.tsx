@@ -1,10 +1,12 @@
 import * as React from 'react';
-import { getRequest } from 'src/api';
-import FileInfo from '../FileInfo';
+import { Route } from 'react-router-dom';
+import * as api from 'src/api';
+import { IProjectInfo, IProjectInfoFile } from 'src/core';
 import FileTreeNode from '../FileTreeNode';
 import Header from '../Header';
+import PageProjectFile from '../PageProjectFile';
 import TreeView from '../TreeView';
-import { ITreeNode, treeFromFlat } from '../TreeView/lib';
+import { createFlat, ITreeNode, treeFromFlat } from '../TreeView/lib';
 
 import './styles.css';
 
@@ -30,7 +32,7 @@ interface IProps {
 interface IState {
     project: any,
     file: any,
-    tree?: ITreeNode,
+    tree?: ITreeNode<IProjectInfoFile>,
 }
 
 export default class PageProject extends React.Component<IProps, IState, any> {
@@ -40,14 +42,12 @@ export default class PageProject extends React.Component<IProps, IState, any> {
         tree: undefined,
     }
 
-    public componentDidMount() {
-        const url = `/projects/${this.projectId}/info`
+    public async componentDidMount() {
+        const project = await api.getProjectInfo(this.projectId)
 
-        getRequest(url)
-            .then(res => res.json())
-            .then((data: any) => {
-                this.setProject(data.resource)
-            })
+        if (project) {
+            this.setProject(project)
+        }
     }
 
     public render() {
@@ -68,25 +68,35 @@ export default class PageProject extends React.Component<IProps, IState, any> {
                     <div className="tree">
                         <TreeView
                             tree={tree}
-                            onClick={this.onClick}
                             onFoldChange={this.onFold}
                             renderNode={this.renderTreeNode}
                         />
                     </div>
 
-                    {!this.state.file ? null : (
-                        <FileInfo
-                            file={this.state.file}
+                    <main>
+                        <Route
+                            path={`${this.props.match.url}/file/:fileId`}
+                            render={this.renderFileRoute}
                         />
-                    )}
+                    </main>
                 </div>
             </div>
         );
     }
 
-    private setProject(project: any) {
-        const files: string[] = project.files;
-        const tree = treeFromFlat(files)
+    private renderFileRoute = (props: any) => {
+        return (
+            <PageProjectFile
+                {...props}
+                projectId={this.projectId}
+            />
+        )
+    }
+
+    private setProject(project: IProjectInfo) {
+        // const files: string[] = project.files.map(x => x.file);
+        const flat = createFlat<IProjectInfoFile>(x => x.file, project.files)
+        const tree = treeFromFlat(flat)
 
         this.setState({
             project,
@@ -95,42 +105,28 @@ export default class PageProject extends React.Component<IProps, IState, any> {
     }
 
     private get projectId(): string {
-        return this.props.match.params.id;
+        return this.props.match.params.projectId;
     }
 
+    private createFileUrl = (file: IProjectInfoFile) => `/project/${this.projectId}/file/${file.fileId}`
+
     private renderTreeNode = (
-        node: ITreeNode,
-        onClick: (event: Event, node: ITreeNode) => void,
-        onFoldChange: (node: ITreeNode) => void,
+        node: ITreeNode<IProjectInfoFile>,
+        onClick: (event: Event, node: ITreeNode<IProjectInfoFile>) => void,
+        onFoldChange: (node: ITreeNode<IProjectInfoFile>) => void,
     ) => {
         const on: any = () => this.onFold(node)
 
         return (
             <FileTreeNode
                 node={node}
-                onClick={onClick}
+                createFileLink={this.createFileUrl}
                 onFoldClick={on}
             />
         )
     }
 
-    private onClick = (event: Event, n: ITreeNode) => {
-        // console.log(n)
-
-        getRequest(`/projects/${this.projectId}/file`, {
-            file: n.id,
-        })
-            .then(res => res.json())
-            .then((data: any) => {
-                const file = data.resource;
-
-                this.setState({
-                    file,
-                });
-            })
-    }
-
-    private onFold = (n: ITreeNode) => {
+    private onFold = (n: ITreeNode<IProjectInfoFile>) => {
         console.log('Change fold')
         console.log(n)
 

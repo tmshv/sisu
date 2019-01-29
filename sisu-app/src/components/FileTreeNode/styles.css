@@ -1,9 +1,28 @@
 .FileTreeNode {
     --text-align: left;
     --font-size: 14px;
+    --highlight: #e7e6e0;
 
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
+    justify-content: space-between;
+}
+
+.FileTreeNode .file-info {
+    --status-color: #ccc;
+    padding: 0 10px;
+    font-size: var(--font-size);
+    font-family: monospace;
+
+    background-color: var(--status-color);
+}
+
+.FileTreeNode .file-info.status-pass {
+    --status-color: green;
+}
+
+.FileTreeNode .file-info.status-fail {
+    --status-color: red;
 }
 
 .FileTreeNode span {
@@ -27,7 +46,38 @@
 .FileTreeNode button:hover {
     cursor: pointer;
 
-    background-color: #e7e6e0;
+    background-color: var(--highlight);
+}
+
+.FileTreeNode button:focus {
+    outline: none;
+
+    background-color: var(--highlight);
+}
+
+.FileTreeNode a {
+    color: black;
+    text-align: var(--text-align);
+    text-decoration: none;
+    font-size: var(--font-size);
+
+    background: none;
+    padding: 3px 5px;
+    border: none;
+}
+
+.FileTreeNode a:focus {
+    outline: none;
+
+    background-color: var(--highlight);
+}
+
+.FileTreeNode a:hover {
+    background-color: var(--highlight);
+}
+
+.FileTreeNode a:visited {
+    color: black;
 }
 
 .FileTreeNode .folder{

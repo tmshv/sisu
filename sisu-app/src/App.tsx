@@ -5,6 +5,7 @@ import PageHome from './components/PageHome';
 import PageLogin from './components/PageLogin';
 import PageProject from './components/PageProject';
 import PageProjectConfig from './components/PageProjectConfig';
+// import PageProjectFile from './components/PageProjectFile';
 import { UserContext } from './context';
 
 import './App.css';
@@ -56,8 +57,8 @@ class App extends React.Component<{}, IState, any> {
                         <Switch>
                             <Route exact={true} path="/" component={PageHome} />
                             <Route path="/login" component={PageLogin} />
-                            <Route path="/project/:id/config" component={PageProjectConfig} />
-                            <Route path="/project/:id" component={PageProject} />
+                            <Route path="/project/:projectId/config" component={PageProjectConfig} />
+                            <Route path="/project/:projectId" component={PageProject} />
                         </Switch>
                     </div>
                 </Router>

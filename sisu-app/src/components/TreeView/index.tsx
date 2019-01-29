@@ -2,18 +2,18 @@ import * as React from 'react';
 import { ITreeNode } from './lib';
 import TreeNode from './TreeNode';
 
-export interface ITreeViewProps {
-    tree: ITreeNode,
-    onClick: (event: Event, node: ITreeNode) => void,
-    onFoldChange: (node: ITreeNode) => void,
+export interface ITreeViewProps<T> {
+    tree: ITreeNode<T>,
+    onClick?: (event: Event, node: ITreeNode<T>) => void,
+    onFoldChange: (node: ITreeNode<T>) => void,
     renderNode(
-        node: ITreeNode,
-        onClick: (event: Event, node: ITreeNode) => void,
-        onFoldChange: (node: ITreeNode) => void,
+        node: ITreeNode<T>,
+        onClick: (event: Event, node: ITreeNode<T>) => void,
+        onFoldChange: (node: ITreeNode<T>) => void,
     ): JSX.Element,
 }
 
-export default class TreeView extends React.Component<ITreeViewProps, any, any> {
+export default class TreeView<T> extends React.Component<ITreeViewProps<T>, any, any> {
     public render() {
         return (
             <div className="TreeView">

@@ -1,26 +1,42 @@
 import FlatToNested from 'flat-to-nested'
-import {uniqBy} from 'lodash'
+import { uniqBy } from 'lodash'
 
-export interface ITreeNode {
+export interface ITreeNode<T> {
     folded: boolean,
+    payload: T,
     id: string,
     name: string,
-    nodes: ITreeNode[],
+    nodes: Array<ITreeNode<T>>,
 }
 
-const id = () => `${Math.floor(Math.random() * 1000)}`
-
-export function node(name: string, nodes: ITreeNode[]): ITreeNode {
-    return {
-        folded: false,
-        id: id(),
-        name,
-        nodes,
-    }
+interface INodeItem<T> {
+    id: string,
+    parent: string | null,
+    name: string,
+    payload: T | null,
 }
 
-export function treeFromFlat(files: string[]): ITreeNode {
-    const flat = createFlat(files)
+// const id = () => `${Math.floor(Math.random() * 1000)}`
+
+// export function node(name: string, nodes: ITreeNode[]): ITreeNode {
+//     return {
+//         folded: false,
+//         id: id(),
+//         name,
+//         nodes,
+//     }
+// }
+
+export function createId (parts: string[]): string {
+    return parts.reverse().join('/')
+}
+
+export function treeFromFlat<T>(files: Array<INodeItem<T>>): ITreeNode<T> {
+    const flat = files
+        .map(x => ({
+            ...x,
+            folded: false,
+        }))
     const nest = new FlatToNested({
         children: 'nodes',
         id: 'id',
@@ -30,25 +46,24 @@ export function treeFromFlat(files: string[]): ITreeNode {
     return nest.convert(flat);
 }
 
-function createFlat(files: string[]): object[] {
-    // [
-    //     {id: 111, parent: 11},
-    //     {id: 11, parent: 1},
-    //     {id: 12, parent: 1},
-    //     {id: 1}
-    // ];
+export function createFlat<T>(selector: (item: T) => string, items: T[]): Array<INodeItem<T>> {
+    const selectedItems = items.reduce((acc, item) => {
+        const file = selector(item)
+        const fileId = createId(splitFilepath(file).reverse())
+        acc.set(fileId, item)
 
-    const createId = (items: string[]): string => {
-        return items.reverse().join('/')
-    }
+        return acc
+    }, new Map())
 
-    const flat = flatArray(
-        files.map(file => splitFilepath(file)
+    const flat: Array<INodeItem<T>> = flatArray(items.map(item => {
+        const file = selector(item)
+
+        return splitFilepath(file)
             .reverse()
             .map((part, i, parts) => ({
-                folded: false,
                 id: createId(parts.slice(i)),
                 name: part,
+                payload: null,
             }))
             .reduce((acc, part, index, list) => {
                 const parent = index < list.length - 1
@@ -59,17 +74,23 @@ function createFlat(files: string[]): object[] {
                     parent,
                 }
                 return [...acc, x]
-            }, []))
-    )
+            }, [])
+    }))
+
+    for (const item of flat) {
+        if (selectedItems.has(item.id)) {
+            item.payload = selectedItems.get(item.id)
+        }
+    }
 
     return uniqBy(flat, x => x.id)
 }
 
-function splitFilepath(filepath: string): string[] {
+export function splitFilepath(filepath: string): string[] {
     const parts = flatArray(filepath
         .replace(/\\/g, '/')
         .split(/^(\w:)/)
-        .map(x => x.split('/'))
+        .map(x => x.split('/')),
     )
 
     return parts.filter(x => x !== '')

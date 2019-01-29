@@ -18,8 +18,14 @@ export default class Header extends React.PureComponent<IHeaderProps, {}, any> {
                     </h1>
 
                     {!this.props.title ? null : (
-                        <h2 className="title">{this.props.title}</h2>
+                        <h2 className="title">
+                            <Link to={'/project/a101'}>
+                                {this.props.title}
+                            </Link>
+                        </h2>
                     )}
+
+                    <Link to={'/project/a101/config'}>Config</Link>
                 </div>
 
                 <div>

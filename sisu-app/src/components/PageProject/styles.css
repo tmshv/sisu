@@ -9,6 +9,10 @@
     flex: 1;
 }
 
+.PageProject main{
+    flex: 1;
+}
+
 .PageProject .tree {
     display: flex;
     min-width: 400px;
