@@ -35,6 +35,8 @@
 }
 
 .FileTreeNode button {
+    flex: 1;
+
     text-align: var(--text-align);
     font-size: var(--font-size);
 
@@ -56,6 +58,8 @@
 }
 
 .FileTreeNode a {
+    flex: 1;
+
     color: black;
     text-align: var(--text-align);
     text-decoration: none;
@@ -81,6 +85,8 @@
 }
 
 .FileTreeNode .folder{
+    flex: 1;
+
     display: flex;
     align-items: center;
 }
