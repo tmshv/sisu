@@ -11,7 +11,7 @@ body {
 :root {
     --module: 25px;
 
-    --first-color: #222;
+    --first-color: black;
     --second-color: white;
     --active-color: #dbcb51;
 
