@@ -1,0 +1,18 @@
+.IconButton {
+    cursor: pointer;
+
+    width: var(--module);
+    height: var(--module);
+
+    background: none;
+    border: none;
+}
+
+.IconButton:hover {
+    background: var(--color-highlight);
+}
+
+.IconButton:disabled {
+    cursor: auto;
+    background: none;
+}

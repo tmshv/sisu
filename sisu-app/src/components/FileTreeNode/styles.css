@@ -6,6 +6,15 @@
     display: flex;
     /* flex-direction: column; */
     justify-content: space-between;
+    align-items: center;
+}
+
+.FileTreeNode .actions {
+    display: none;
+}
+
+.FileTreeNode:hover .actions {
+    display: flex;
 }
 
 .FileTreeNode .file-info {
@@ -34,7 +43,7 @@
     padding: 4px 5px;
 }
 
-.FileTreeNode button {
+.FileTreeNode .folder button {
     flex: 1;
 
     text-align: var(--text-align);
@@ -45,19 +54,21 @@
     border: none;
 }
 
-.FileTreeNode button:hover {
+.FileTreeNode .folder button:hover {
     cursor: pointer;
 
     background-color: var(--highlight);
 }
 
-.FileTreeNode button:focus {
+.FileTreeNode .folder button:focus {
     outline: none;
 
     background-color: var(--highlight);
 }
 
 .FileTreeNode a {
+    height: var(--module);
+    line-height: var(--module);
     flex: 1;
 
     color: black;
@@ -66,7 +77,8 @@
     font-size: var(--font-size);
 
     background: none;
-    padding: 3px 5px;
+    /* padding: 3px 5px; */
+    padding: 0px 5px;
     border: none;
 }
 
@@ -93,4 +105,13 @@
 
 .FileTreeNode .folder button{
     flex: 1;
+    height: var(--module);
+}
+
+.FileTreeNode a.status-fail {
+    color: red;
+}
+
+.FileTreeNode a.status-pass {
+    color: #03c503;
 }

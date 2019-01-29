@@ -9,7 +9,11 @@ body {
 }
 
 :root {
+    --module: 25px;
+
     --first-color: #222;
     --second-color: white;
     --active-color: #dbcb51;
+
+    --color-highlight: #e7e6e0;
 }
