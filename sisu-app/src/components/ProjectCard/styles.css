@@ -3,8 +3,18 @@
     justify-content: center;
     align-items: center;
 
-    border: 1px solid var(--first-color);
+    border: 7px solid var(--first-color);
 
     width: 100px;
     height: 100px;
+}
+
+/* arrange */
+
+.ProjectCard {
+    margin-right: 10px;
+}
+
+.ProjectCard:last-child {
+    margin-right: 0;
 }
