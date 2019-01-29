@@ -2,7 +2,8 @@
 node_modules
 
 *.log
-.env
+.env*
 dist
+build
 __pycache__
 *.pyc
