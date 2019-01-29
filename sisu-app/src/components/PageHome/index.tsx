@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 import withUser from 'src/decorators/withUser';
 import Banner from '../Banner';
 import Header from '../Header';
@@ -14,12 +15,13 @@ class PageHome extends React.PureComponent<IProps, {}, any> {
     public render() {
         return (
             <div className="PageHome">
-                <Header />
-
                 {!this.props.user ? this.renderBasic() : (
-                    <UserMainInfo
-                        user={this.props.user}
-                    />
+                    <React.Fragment>
+                        <Header />
+                        <UserMainInfo
+                            user={this.props.user}
+                        />
+                    </React.Fragment>
                 )}
             </div>
         );
@@ -28,6 +30,12 @@ class PageHome extends React.PureComponent<IProps, {}, any> {
     private renderBasic = () => (
         <main>
             <Banner />
+
+            <div className={'login-form'}>
+                <Link to={'/login'}>
+                    login
+                </Link>
+            </div>
         </main>
     )
 }
