@@ -6,12 +6,7 @@ import { createProjectInfo } from "../core/factory";
 import { findProject } from "../data/project";
 import { normalizePath } from "../util";
 import { createFileId } from "../core/lib/file";
-
-function array<T>(maybeArray?: Array<T>): Array<T> {
-    return Array.isArray(maybeArray)
-        ? maybeArray!
-        : [];
-}
+import { array } from "../util/array";
 
 export function getProject(db: Db) {
     return async (req: Request, res: Response) => {
