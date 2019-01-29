@@ -1,3 +1,7 @@
 .Banner {
     width: 150px;
 }
+
+.Banner img {
+    display: block;
+}
