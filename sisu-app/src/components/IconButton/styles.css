@@ -1,18 +1,32 @@
 .IconButton {
+    --background: none;
+
     cursor: pointer;
 
     width: var(--module);
     height: var(--module);
 
-    background: none;
+    background: var(--background);
     border: none;
-}
 
-.IconButton:hover {
-    background: var(--color-highlight);
+    outline: none;
 }
 
 .IconButton:disabled {
     cursor: auto;
     background: none;
+}
+
+/* theme */
+
+.IconButton.theme-light:hover {
+    --background: var(--color-highlight);
+}
+
+.IconButton.theme-dark:hover svg {
+    fill: var(--color-main);
+}
+
+.IconButton.theme-dark:focus svg {
+    fill: var(--color-main);
 }

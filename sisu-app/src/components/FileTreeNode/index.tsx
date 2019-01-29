@@ -35,6 +35,7 @@ export default class FileTreeNode extends React.Component<IFileTreeNodeProps<IPr
                 {!showActions ? null : (
                     <div className={'actions'}>
                         <IconButton
+                            theme={'light'}
                             disabled={true}
                             size={15}
                             onClick={this.onClickCopyLink}

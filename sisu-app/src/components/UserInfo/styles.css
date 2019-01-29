@@ -1,0 +1,8 @@
+.UserInfo {
+    display: flex;
+    align-items: center;
+}
+
+.UserInfo .actions {
+    margin-left: 10px;
+}
