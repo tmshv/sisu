@@ -12,6 +12,7 @@
 
     height: 44px;
     padding: 0px 15px;
+    background: transparent;
 
     cursor: pointer;
 }
