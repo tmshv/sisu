@@ -1,14 +1,15 @@
-interface File {
+export interface IFile {
     file: string;
     fileId: string;
     type: string;
+    buildStatus: string;
 }
 
 export interface IProjectInfo {
     name: string;
     id: string;
     uri: string;
-    files: File[];
+    files: IFile[];
 }
 
 export interface IExternalUser {

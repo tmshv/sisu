@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { Db } from "mongodb";
 import { success, error, resource } from "../lib/api";
 import { IProjectFile, IProjectState, IFileTest } from "../core";
-import { createProjectInfo } from "../core/factory";
+import { createProjectInfo, createProjectFile } from "../core/factory";
 import { findProject } from "../data/project";
 import { normalizePath } from "../util";
 import { createFileId } from "../core/lib/file";
@@ -60,14 +60,16 @@ export function getProjectFile(db: Db) {
             }));
         }
 
-        const resource = project.files.find(x => x.fileId === fileId);
+        const file = project.files.find(x => x.fileId === fileId);
 
-        if (!resource) {
+        if (!file) {
             res.status(404);
             return res.json(error({
                 message: `Project ${projectId} does'nt contains file ${fileId}`,
             }));
         }
+
+        const resource = createProjectFile(file);
 
         res.json(success({
             resource,
