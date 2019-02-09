@@ -69,20 +69,17 @@ export function createServer(db: Db): Application {
 
     app.get("/utils/create-project-file-id", utilsController.getProjectFileId());
 
+    // PROJECT
     app.get("/projects/:id", isAuthenticated, projectController.getProject(db));
     app.get("/projects/:id/info", isAuthenticated, projectController.getProjectInfo(db));
-
+    app.get("/projects/:id/config", isAuthenticated, projectController.getProjectConfig(db));
+    app.get("/projects/:id/config/input", isAuthenticated, projectController.getProjectConfigInput(db));
     app.get("/projects/:projectId/file/:fileId", isAuthenticated, projectController.getProjectFile(db));
     app.put("/projects/:projectId/file/:fileId", isAuthenticated, projectController.setProjectFile(db));
     app.put("/projects/:projectId/file/:fileId/tests", isAuthenticated, projectController.setProjectFileTests(db));
-
-    app.get("/projects/:id/config", isAuthenticated, projectController.getProjectConfig(db));
-    app.get("/projects/:id/config/input", isAuthenticated, projectController.getProjectConfigInput(db));
     // app.put("/projects/:id/config", isAuthenticated, projectController.setProjectConfig(db));
-
     app.get("/projects/:id/config-data", isAuthenticated, projectController.getProjectConfigData(db));
     app.put("/projects/:id/config-data", isAuthenticated, projectController.setProjectConfigData(db));
-
     app.get("/projects/:id/state", isAuthenticated, projectController.getProjectState(db));
     app.post("/projects/:id/update-state", isAuthenticated, projectController.updateProjectState(db));
 
