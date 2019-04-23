@@ -23,7 +23,7 @@ async function loopDataProvider(db, dataProvider) {
     await updateDataProviderScanId(db, dip, scanId, time)
 
     // remove files with old scan id
-    await deleteOldFiles(db, scanId)
+    await deleteOldFiles(db, dip, scanId)
 }
 
 module.exports = async (db, sleepMs, scanDelayMs) => {

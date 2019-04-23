@@ -55,8 +55,9 @@ async function insertFiles (db, files) {
     return []
 }
 
-async function deleteOldFiles (db, scanId) {
+async function deleteOldFiles (db, dataProviderId, scanId) {
     await db.collection('files').deleteMany({
+        dataProviderId,
         scanId: { $ne: scanId },
     })
 
