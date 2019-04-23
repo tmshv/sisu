@@ -12,11 +12,12 @@ async function loopDataProvider(db, dataProvider) {
     const time = new Date()
 
     // get new files
-    const flat = await getFlat(dataProvider)
-    const scanId = flat.scanId
+    const {scanId, files} = await getFlat(dataProvider)
 
-    // insert files in collection
-    await insertFiles(db, flat.files)
+    if (files.length) {
+        // insert files in collection
+        await insertFiles(db, files)
+    }
 
     // replace data provider scan id
     await updateDataProviderScanId(db, dip, scanId, time)
@@ -27,6 +28,7 @@ async function loopDataProvider(db, dataProvider) {
 
 module.exports = async (db, sleepMs, scanDelayMs) => {
     let active = true
+
     while (active) {
         const currentTime = (new Date()).getTime()
         const dps = await findDataProviders(db)
