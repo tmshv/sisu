@@ -25,17 +25,16 @@ async function getDb(mongoUri, dbName) {
 }
 
 (async () => {
-    const sec = s => s * 1000
-    const min = m => sec(m * 60)
-
     const mongoUri = process.env.MONGODB_URI
     const dbName = process.env.DB_NAME
     const port = process.env.PORT
     const secret = process.env.SECRET
+    const loopSleep = process.env.LOOP_SLEEP
+    const updateDelay = process.env.UPDATE_DELAY
 
     const db = await getDb(mongoUri, dbName)
 
-    const cancelLoop = loop(db, sec(10), min(5))
+    const cancelLoop = loop(db, loopSleep, updateDelay)
     await createApp(db, {
         port,
         secret,
