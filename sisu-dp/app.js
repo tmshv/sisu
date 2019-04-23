@@ -3,8 +3,19 @@ const logger = require('koa-logger')
 const createRouter = require('./router')
 
 function isAuthorized(secret) {
+    const getToken = ctx => {
+        if ('x-token' in ctx.headers) {
+            return ctx.headers['x-token']
+        }
+
+        if (ctx.query.token) {
+            return ctx.query.token
+        }
+
+        return null
+    }
     return async (ctx, next) => {
-        const token = ctx.headers['x-token']
+        const token = getToken(ctx)
         
         if (token !== secret) {
             ctx.status = 403
