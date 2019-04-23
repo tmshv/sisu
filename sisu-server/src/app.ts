@@ -19,6 +19,8 @@ import * as fileController from "./controllers/file";
 import * as utilsController from "./controllers/utils";
 import { createProjectInfo } from "./core/factory";
 import { ENVIRONMENT } from "./util/secrets";
+import { IUser } from "./core";
+import { findProjectsById } from "./data/project";
 
 function array<T>(maybeArray?: Array<T>): Array<T> {
     return Array.isArray(maybeArray)
@@ -59,7 +61,10 @@ export function createServer(db: Db): Application {
     app.post("/upload", isAuthenticated, fileController.createFile("file"), fileController.postUpload());
 
     app.get("/projects", isAuthenticated, async (req: Request, res: Response) => {
-        const projects = await db.collection("projects").find({}).toArray();
+        const user: IUser = req.user as IUser;
+
+        // const projects = await db.collection("projects").find({}).toArray();
+        const projects = await findProjectsById(db, user.projects);
         const resource = projects.map(createProjectInfo);
 
         res.json(success({
