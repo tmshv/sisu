@@ -1,4 +1,10 @@
-async function findDataProviderById (db, id) {
+const { ObjectId } = require('bson')
+
+function oid(v) {
+    return new ObjectId(v)
+}
+
+async function findDataProviderById(db, id) {
     const result = await db.collection('dataproviders')
         .findOne({
             _id: id,
@@ -75,6 +81,7 @@ async function findFileByFileId (db, fileId) {
     return files.find(f => f.scanId === scanId)
 }
 
+exports.oid = oid
 exports.findDataProviderById = findDataProviderById
 exports.findDataProviders = findDataProviders
 exports.updateDataProviderScanId = updateDataProviderScanId

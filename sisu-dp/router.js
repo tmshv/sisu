@@ -1,5 +1,5 @@
 const Router = require('koa-router')
-const { findDataProviderById, findFilesByScanId, findFileByFileId } = require('./data')
+const { oid, findDataProviderById, findFilesByScanId, findFileByFileId } = require('./data')
 const { createReadStream } = require('./lib')
 
 function error(message) {
@@ -11,7 +11,7 @@ function error(message) {
 }
 
 module.exports = function createRouter(db) {
-    const getDataProviderId = ctx => ctx.params.dataProviderId
+    const getDataProviderId = ctx => oid(ctx.params.dataProviderId)
     const getFileId = ctx => ctx.params.fileId
     const router = new Router()
 
@@ -67,7 +67,7 @@ module.exports = function createRouter(db) {
             return
         }
 
-        const dataProvider = await findDataProviderById(db, file.dataProviderId)
+        const dataProvider = await findDataProviderById(db, oid(file.dataProviderId))
         const stream = await createReadStream(dataProvider, file.filename)
 
         if (!stream) {
