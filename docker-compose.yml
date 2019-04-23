@@ -4,6 +4,20 @@ volumes:
   data:
 
 services:
+  rabbit:
+    image: rabbitmq:3.6-management-alpine
+    restart: "always"
+    container_name: "sisu-rabbit"
+    hostname: sisurabbit
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=SWQOLNMEQG
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
+#      - RABBITMQ_DEFAULT_VHOST="sisu"
+    ports:
+      - "9172:15672"
+      - "9156:5672"
+
   mongo:
     image: mongo:4
     restart: always
@@ -16,22 +30,30 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
       - MONGO_INITDB_DATABASE=sisu
   api:
+    container_name: "sisu-api"
+    restart: always
     build:
       context: ./sisu-server
     links:
       - mongo
-    ports:
-      - 5000:5000
     depends_on:
       - mongo
+    ports:
+      - "127.0.0.1:9150:5000"
+    volumes:
+      - /var/data/www/sisu.unit4.io:/upload
     environment:
       - PORT=5000
-      - MONGODB_URI=mongodb://master:${MONGO_PASSWORD}mongo:27017/sisu
+      - MONGODB_URI=mongodb://master:${MONGO_PASSWORD}@mongo:27017/sisu?authSource=admin
       - JWT_SECRET=${JWT_SECRET}
+      - UPLOAD_DIR=/upload
+      - UPLOAD_PUBLIC_PATH=/data/uploads/
   app:
+    container_name: "sisu-app"
+    restart: always
     build:
       context: ./sisu-app
     ports:
-      - 3000:80
+      - "127.0.0.1:9180:80"
     depends_on:
       - api
