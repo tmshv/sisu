@@ -2,6 +2,7 @@ import { basename } from 'path';
 import * as React from 'react';
 import { IFile } from 'src/core';
 
+import FilePreview from '../FilePreview';
 import './styles.css';
 
 interface IProps {
@@ -19,17 +20,36 @@ export default class FileInfo extends React.Component<IProps, IState> {
 
     public render() {
         const file = this.props.file;
+        const fileTests = file.tests || [];
         const name = basename(file.filename);
-        const tests = this.state.onlyFailed
-            ? file.tests.filter(x => x.status === "fail")
-            : file.tests
-
-        console.log(file)
+        const preview: any = (file as any).preview
 
         return (
             <div className="FileInfo">
                 <h1>{name}</h1>
 
+                {!preview ? null : (
+                    <FilePreview
+                        items={preview}
+                    />
+                )}
+
+                {!fileTests.length ? null : (
+                    this.rednerTestsBlock()
+                )}
+            </div>
+        );
+    }
+
+    private rednerTestsBlock = () => {
+        const file = this.props.file;
+        const fileTests = file.tests || [];
+        const tests = this.state.onlyFailed
+            ? fileTests.filter(x => x.status === "fail")
+            : fileTests
+
+        return (
+            <>
                 <h2>Tests</h2>
 
                 <label>
@@ -60,7 +80,7 @@ export default class FileInfo extends React.Component<IProps, IState> {
                         </div>
                     ))}
                 </div>
-            </div>
+            </>
         );
     }
 
