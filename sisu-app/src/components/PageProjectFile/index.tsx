@@ -28,14 +28,14 @@ export default class PageProject extends React.Component<IProps, IState, any> {
         return this.props.match.params.fileId;
     }
 
-    public componentWillReceiveProps(newProps: IProps) {
-        this.update()
+    public componentDidUpdate(newProps: IProps) {
+        if (this.props.match.params.fileId !== newProps.match.params.fileId) {
+            this.update();            
+        }
     }
 
     public componentDidMount() {
-        console.log('match', this.props.match)
-
-        this.update()
+        this.update();
     }
 
     public render() {
