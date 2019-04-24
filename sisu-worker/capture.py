@@ -31,7 +31,8 @@ def capture_named_views():
     
     for view_name in selected_views:
         rs.RestoreNamedView(view_name)
-        rs.Command('-_ViewCaptureToFile '+chr(34)+filename_base+view_name+'.jpg'+chr(34)+' _EnterEnd')
+        comm = '-_ViewCaptureToFile "{}{}.jpg" _EnterEnd'.format(filename_base,view_name)
+        rs.Command(comm)
 
 if __name__== "__main__":
     main()
