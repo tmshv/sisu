@@ -22,7 +22,7 @@ export default class FileInfo extends React.Component<IProps, IState> {
         const file = this.props.file;
         const fileTests = file.tests || [];
         const name = basename(file.filename);
-        const preview: any = (file as any).preview
+        const preview: any = (file as any).preview;
 
         return (
             <div className="FileInfo">
