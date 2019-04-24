@@ -26,6 +26,7 @@
   },
   "dependencies": {
     "async": "^2.6.0",
+    "axios": "^0.18.0",
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.18.2",
     "compression": "^1.7.1",
@@ -51,6 +52,7 @@
     "winston": "^2.4.0"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/async": "^2.0.45",
     "@types/bcrypt-nodejs": "^0.0.30",
     "@types/body-parser": "^1.16.8",
