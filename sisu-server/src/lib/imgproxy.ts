@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { IMGPROXY_KEY, IMGPROXY_SALT } from "../util/secrets";
+import { IMGPROXY_KEY, IMGPROXY_SALT, IMGPROXY_BASE_URL } from "../util/secrets";
 
 const urlSafeBase64 = (value: string | Buffer) => {
     const buf: Buffer = value instanceof Buffer
@@ -44,4 +44,8 @@ export function signImgproxyUrl({
     const signature = sign(IMGPROXY_SALT, path, IMGPROXY_KEY);
 
     return `/${signature}${path}`;
+}
+
+export function createImgproxyUrl(path: string): string {
+    return IMGPROXY_BASE_URL + path;
 }
