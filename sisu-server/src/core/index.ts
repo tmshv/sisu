@@ -19,6 +19,13 @@ export interface IProject {
     config: any;
     configData: string;
     lastState: IProjectState;
+    settings: IProjectSettings;
+}
+
+export interface IProjectSettings {
+    config: any;
+    ignoreInclude: boolean;
+    ignoreData: string;
 }
 
 export interface IProjectFile {

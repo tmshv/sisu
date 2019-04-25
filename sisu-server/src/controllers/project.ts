@@ -9,7 +9,8 @@ import { createFileId } from "../core/lib/file";
 import { array } from "../util/array";
 import { IDataProviderFile } from "../application/types";
 import { createPreview } from "../application/preview";
-import { createFileMetadataUrl, createProviderMetadataUrl } from "../application/provider";
+import { createFileMetadataUrl, createProviderMetadataUrl, filterIgnore } from "../application/provider";
+import { getProjectIgnore } from "../application/project";
 
 export function getProject(db: Db) {
     return async (req: Request, res: Response) => {
@@ -41,9 +42,10 @@ export function getProjectInfo(db: Db) {
             }));
         }
 
+        const ignore = getProjectIgnore(project);
         const dataProviderId = `${project.dataProviders[0]}`;
         const dpRes = await axios.get(createProviderMetadataUrl(dataProviderId));
-        const dpFiles: IDataProviderFile[] = dpRes.data;
+        const dpFiles: IDataProviderFile[] = filterIgnore(dpRes.data, ignore.include, ignore.patterns);
         const metaFiles: IFileMetadata[] = dpFiles.map(x => ({
             fileId: x.fileId,
             file: x.filename,
