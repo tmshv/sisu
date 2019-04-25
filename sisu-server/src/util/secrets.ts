@@ -14,6 +14,8 @@ export const MONGODB_URI = process.env.MONGODB_URI;
 export const JWT_SECRET = process.env.JWT_SECRET;
 export const UPLOAD_DIR = process.env.UPLOAD_DIR;
 export const UPLOAD_PUBLIC_PATH = process.env.UPLOAD_PUBLIC_PATH;
+export const IMGPROXY_KEY = process.env.IMGPROXY_KEY;
+export const IMGPROXY_SALT = process.env.IMGPROXY_SALT;
 
 if (!MONGODB_URI) {
     logger.error("No mongo connection string. Set MONGODB_URI environment variable.");
