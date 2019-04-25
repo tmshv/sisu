@@ -3,6 +3,7 @@ export interface IFile {
     fileId: string;
     type: string;
     buildStatus: string;
+    preview: any;
 }
 
 export interface IProjectInfo {

@@ -1,4 +1,5 @@
 import { ObjectId } from "bson";
+import { IDataProvider } from "../application/types";
 
 export interface IUser {
     _id: ObjectId;
@@ -14,6 +15,7 @@ export interface IProject {
     name: string;
     uri: string;
     files: IProjectFile[];
+    dataProviders: ObjectId[];
     config: any;
     configData: string;
     lastState: IProjectState;

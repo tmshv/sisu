@@ -23,3 +23,7 @@ export function errorMessage(message: string): object {
         message,
     });
 }
+
+export function errorNotFound(resourceId: string): object {
+    return errorMessage(`Resrource ${resourceId} not found`);
+}

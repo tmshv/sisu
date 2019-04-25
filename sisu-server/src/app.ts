@@ -65,7 +65,7 @@ export function createServer(db: Db): Application {
 
         // const projects = await db.collection("projects").find({}).toArray();
         const projects = await findProjectsById(db, user.projects);
-        const resource = projects.map(createProjectInfo);
+        const resource = projects.map(p => createProjectInfo(p, []));
 
         res.json(success({
             resource,

@@ -2,24 +2,20 @@ import { IProject, IUser, IProjectFile, IFileMetadata } from ".";
 import { IProjectInfo, IExternalUser } from "./external";
 import { normalizePath } from "../util";
 import { array } from "../util/array";
+import { createPreview } from "../application/preview";
 
-export function createProjectInfo(project: IProject): IProjectInfo {
-    const files = project.files;
-
+export function createProjectInfo(project: IProject, files: IFileMetadata[]): IProjectInfo {
     return {
         name: project.name,
         id: `${project._id}`,
         uri: project.uri,
-        files: project.lastState.files.map(x => {
-            const file = getProjectFileById(files, x.fileId);
-
-            return ({
-                file: x.file,
-                fileId: x.fileId,
-                type: x.type,
-                buildStatus: getBuildStatus(file),
-            });
-        }),
+        files: files.map(x => ({
+            file: x.file,
+            fileId: x.fileId,
+            type: x.type,
+            buildStatus: "fail",
+            preview: createPreview(x),
+        }))
     };
 }
 
@@ -48,9 +44,11 @@ export function getBuildStatus(file: IProjectFile): string {
 }
 
 export function createExternalUser(user: IUser, projects: IProject[]): IExternalUser {
+    const createProjectInfo2 = (x: IProject) => createProjectInfo(x, []);
+
     return {
         id: `${user._id}`,
         email: user.email,
-        projects: projects.map(createProjectInfo)
+        projects: projects.map(createProjectInfo2)
     };
 }

@@ -1,12 +1,15 @@
 import { Request, Response } from "express";
 import { Db } from "mongodb";
-import { success, error, resource } from "../lib/api";
-import { IProjectFile, IProjectState, IFileTest } from "../core";
-import { createProjectInfo, createProjectFile } from "../core/factory";
+import axios from "axios";
+import { success, error, resource, errorNotFound } from "../lib/api";
+import { IProjectFile, IProjectState, IFileTest, IFileMetadata } from "../core";
+import { createProjectInfo } from "../core/factory";
 import { findProject } from "../data/project";
-import { normalizePath } from "../util";
 import { createFileId } from "../core/lib/file";
 import { array } from "../util/array";
+import { IDataProviderFile } from "../application/types";
+import { createPreview } from "../application/preview";
+import { createFileMetadataUrl, createProviderMetadataUrl } from "../application/provider";
 
 export function getProject(db: Db) {
     return async (req: Request, res: Response) => {
@@ -38,7 +41,16 @@ export function getProjectInfo(db: Db) {
             }));
         }
 
-        const resource = createProjectInfo(project);
+        const dataProviderId = `${project.dataProviders[0]}`;
+        const dpRes = await axios.get(createProviderMetadataUrl(dataProviderId));
+        const dpFiles: IDataProviderFile[] = dpRes.data;
+        const metaFiles: IFileMetadata[] = dpFiles.map(x => ({
+            fileId: x.fileId,
+            file: x.filename,
+            hash: x.revision,
+            type: x.type,
+        }));
+        const resource = createProjectInfo(project, metaFiles);
 
         res.json(success({
             resource,
@@ -50,29 +62,19 @@ export function getProjectFile(db: Db) {
     return async (req: Request, res: Response) => {
         const projectId = req.params.projectId;
         const fileId = req.params.fileId;
-
         const project = await findProject(db, projectId);
 
         if (!project) {
             res.status(404);
-            return res.json(error({
-                message: `Project ${projectId} not found`,
-            }));
+            return res.json(errorNotFound(projectId));
         }
 
-        const file = project.files.find(x => x.fileId === fileId);
+        const response = await axios.get(createFileMetadataUrl(fileId));
+        const file: IDataProviderFile = response.data;
 
-        if (!file) {
-            res.status(404);
-            return res.json(error({
-                message: `Project ${projectId} does'nt contains file ${fileId}`,
-            }));
-        }
-
-        const resource = createProjectFile(file);
-
-        res.json(success({
-            resource,
+        res.json(resource({
+            ...file,
+            preview: createPreview(file),
         }));
     };
 }
