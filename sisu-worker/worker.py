@@ -52,7 +52,7 @@ def main():
     channel.basic_qos(prefetch_count=1)
 
     print('Waiting for messages. To exit press CTRL+C')
-    channel.basic_consume(callback, queue=queue)
+    channel.basic_consume(queue, callback)
     channel.start_consuming()
 
 
