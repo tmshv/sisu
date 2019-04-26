@@ -5,6 +5,9 @@ import sys
 import core
 
 
+handler = core.create_handler()
+
+
 def callback(ch, method, props, body):
     try:
         msg = json.loads(body)
@@ -12,7 +15,7 @@ def callback(ch, method, props, body):
 
         print('> Action', action)
 
-        result = core.handle_message(msg)
+        result = core.handle_message(handler, msg)
         body = json.dumps(result)
         properties = pika.BasicProperties(correlation_id=props.correlation_id)
         ch.basic_publish(

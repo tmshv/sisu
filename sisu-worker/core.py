@@ -1,5 +1,6 @@
 import os
 import json
+import time
 from glob import glob
 import subprocess
 from api import api_init, api_set_project_file_tests
@@ -89,12 +90,29 @@ def handle_file_test(message):
     return result
 
 
-def handle_message(message):
+def handle_system_ping(message):
+    payload = message['payload']
+    t = payload['sleep']
+    time.sleep(t)
+
+    return {
+        'message': 'pong',
+        'source': message,
+    }
+
+
+def create_handler():
+    return {
+        'SYSTEM.PING': handle_system_ping,
+        'FILE_TREE.UPDATE': handle_file_tree_update,
+        'FILE.TEST': handle_file_test,
+    }
+
+
+def handle_message(handler, message):
     action = message['action']
 
-    if action == 'FILE_TREE.UPDATE':
-        return handle_file_tree_update(message)
-    elif action == 'FILE.TEST':
-        return handle_file_test(message)
+    if action in handler:
+        return handler[action](message)
     else:
         return None
