@@ -33,7 +33,7 @@ def callback(ch, method, props, body):
 
 
 def main():
-    vhost = 'sisu'
+    # vhost = 'sisu'
     queue = 'sisu'
     host = sys.argv[1]
     port = int(sys.argv[2])
@@ -43,7 +43,7 @@ def main():
     params = pika.ConnectionParameters(
         host=host,
         port=port,
-        virtual_host=vhost,
+        # virtual_host=vhost,
         credentials=credentials,
     )
     connection = pika.BlockingConnection(params)
