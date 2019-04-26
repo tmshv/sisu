@@ -79,7 +79,7 @@ def handle_file_test(message):
     api_init(payload['token'])
     testfile = get_test_script_path()   
     save_rhino_task_file(payload)
-    subprocess.call('cscript run.vbs "{t}"'.format(t=testfile))
+    subprocess.call(f'cscript run.vbs "{testfile}"')
 
     result = read_rhino_result_file()
 
