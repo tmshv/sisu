@@ -35,13 +35,13 @@ export default class FileInfo extends React.Component<IProps, IState> {
                 )}
 
                 {!fileTests.length ? null : (
-                    this.rednerTestsBlock()
+                    this.renderTestsBlock()
                 )}
             </div>
         );
     }
 
-    private rednerTestsBlock = () => {
+    private renderTestsBlock = () => {
         const file = this.props.file;
         const fileTests = file.tests || [];
         const tests = this.state.onlyFailed
