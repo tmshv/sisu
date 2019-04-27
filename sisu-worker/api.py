@@ -37,6 +37,8 @@ def request_put(url, data):
     try:
         res = requests.put(url, json=data, headers=headers)
         print(res.status_code)
+
+        return res.json()
     except Exception as e:
         print(e)
 
