@@ -9,7 +9,7 @@ def api_init(token):
 
 
 def api_url(path):
-    return f'http://sisu.unit4.io/api{path}'
+    return f'https://sisu.unit4.io/api{path}'
 
 
 def request_headers(custom_headers):
