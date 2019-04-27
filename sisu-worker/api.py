@@ -71,3 +71,30 @@ def api_project_update_file(project_id, filename, log_list):
     print(res)
     print(log)
 
+
+def api_get_file_metadata(file_id):
+    url = api_url(f'/data/files/{file_id}/metadata?token={TOKEN}')
+
+    try:
+        res = requests.get(url)
+        if res.status_code == 404:
+            return None
+
+        return res.json()
+    except Exception as e:
+        print(e)
+        return None
+
+
+def api_get_file_content(file_id):
+    url = api_url(f'/data/files/{file_id}/content?token={TOKEN}')
+
+    try:
+        res = requests.get(url)
+        if res.status_code == 404:
+            return None
+
+        return res.content
+    except Exception as e:
+        print(e)
+        return None
