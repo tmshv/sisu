@@ -3,6 +3,7 @@ import scriptcontext as sc
 import Rhino
 import os
 import json
+from rhino import script_start, script_end, open_file, get_config, save_result
 
 
 class Capture:
@@ -22,11 +23,6 @@ class Capture:
         rs.Command(command, False)
 
 
-def open_file(path):
-    rs.DocumentModified(False)
-    return rs.Command('_-Open "{}" _Enter'.format(path))
-
-
 def capture_named_views(view, file):
     command = '-_ViewCaptureToFile {file} _EnterEnd'.format(file=file)
 
@@ -39,17 +35,16 @@ def capture_named_views(view, file):
 
 
 def main():
-    task_filename = os.path.expanduser('~/Desktop/sisu_task.json')
+    config = get_config()
 
-    with open(task_filename, 'r') as f:
-        data = json.load(f)
-
-    file_id = data['fileId']
-    files_dir = data['outputDir']
-    items = data['previews']
-    capture_command = data.get('captureRhinoCommand', 'ViewCaptureToFile')
-
-    filename = data['filename']
+    file_id = config['fileId']
+    files_dir = config['outputDir']
+    items = config['previews']
+    filename = config['filename']
+    capture_command = config.get('captureRhinoCommand', 'ViewCaptureToFile')
+    
+    script_start()
+    
     s = open_file(filename)
 
     # if not s:
@@ -58,6 +53,9 @@ def main():
     # return
 
     c = Capture(capture_command)
+    result = {
+        'previews': [],
+    }
 
     i = 0
     for capture in items:
@@ -67,12 +65,14 @@ def main():
 
         c.create_capture(viewport, result_filename)
 
+        result['previews'].append(result_filename)
+
         # named_views = rs.NamedViews()
         # capture_named_views(named_views[0], result_filename)
         i += 1
 
-    rs.DocumentModified(False)
-    rs.Exit()
+    save_result(result)
+    script_end()
 
 
 if __name__ == '__main__':
