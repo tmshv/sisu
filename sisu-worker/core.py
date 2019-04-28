@@ -141,6 +141,35 @@ def handle_file_preview(message):
     return rhino_run(script, params)
 
 
+def handle_run_gh(message):
+    payload = message['payload']
+    
+    token = payload['token']
+    api_init(token)
+
+    env_dir = get_env_dir()
+    file_id = payload['fileId']
+    env_options = {
+        'env_dir': env_dir,
+    }
+    env = setup_environment(message, env_options)
+
+    print(f'> run gh script on {file_id}')
+
+    filename = env['file_local'][file_id]
+    basename = os.path.basename(filename)
+
+    script = get_script_path('gh.py')
+    params = {
+        **payload,
+        'filename': env['file_local'][file_id],
+        'outputDir': env_dir,
+        'outputFile': f'OUT_{basename}',
+    }
+
+    return rhino_run(script, params)
+
+
 def handle_file_test(message):
     payload = message['payload']
     
@@ -189,6 +218,7 @@ def create_handler():
         'FILE_TREE.UPDATE': handle_file_tree_update,
         'FILE.TEST': handle_file_test,
         'FILE.PREVIEW': handle_file_preview,
+        'RUN.GH': handle_run_gh,
     }
 
 
