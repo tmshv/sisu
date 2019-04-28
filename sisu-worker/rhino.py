@@ -14,6 +14,10 @@ def open_file(path):
     return rs.Command('_-Open "{}" _Enter'.format(path))
 
 
+def save_file(path):
+    rs.Command('-_Save "{}"'.format(path))
+
+
 def get_config():
     task_file = os.path.expanduser(FILE_INPUT)
     with open(task_file, 'r') as f:
