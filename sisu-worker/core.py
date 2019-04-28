@@ -133,10 +133,9 @@ def handle_file_preview(message):
 
     script = get_script_path('capture.py')
     params = {
+        **payload,
         'filename': env['file_local'][file_id],
         'outputDir': env_dir,
-        'previews': payload['previews'],
-        'fileId': file_id,
     }
 
     return rhino_run(script, params)
