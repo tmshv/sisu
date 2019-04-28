@@ -1,5 +1,10 @@
 # Sisu worker
 
+## Setup
+
+1. Copy `config-example.ini` to `config.ini`
+2. Fill `config.ini` with your values
+
 ## Run on Windows
 
 ```bash
