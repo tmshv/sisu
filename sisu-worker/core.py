@@ -4,6 +4,7 @@ import time
 from glob import glob
 import subprocess
 from api import api_init, api_set_project_file_tests, api_get_file_metadata, api_get_file_content
+from s3 import s3_upload
 
 
 def get_env_dir():
@@ -140,8 +141,13 @@ def handle_file_preview(message):
 
     result = rhino_run(script, params)
 
-    for preview_file in result['previews']:
-        print(preview_file)
+    previews = zip(payload['previews'], result['previews'])
+    for preview, preview_file in previews:
+        suffix = preview['viewport']
+        obj = f'preview/{file_id}-{suffix}.png'
+        s3_upload('sisu', obj, preview_file)
+
+        print(f'> upload to s3 {obj}', preview_file)
 
     return result
 
