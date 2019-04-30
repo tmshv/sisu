@@ -138,7 +138,12 @@ def handle_file_preview(message):
         'outputDir': env_dir,
     }
 
-    return rhino_run(script, params)
+    result = rhino_run(script, params)
+
+    for preview_file in result['previews']:
+        print(preview_file)
+
+    return result
 
 
 def handle_run_gh(message):
