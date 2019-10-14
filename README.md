@@ -139,3 +139,8 @@ Make screenshot of dwg model. Upload with `/api/v1/upload`
     },
 }
 ```
+## Related projects
+
+### [nexrender](https://github.com/inlife/nexrender)
+
+Data driven automation for After Effects
