@@ -1,5 +1,55 @@
 # Sisu
 
+// dp
+
+Create data provider 
+POST /dp/
+
+Get current files metadata
+GET  /dp/<dp_id>/files/metadata
+
+Get changed files metadata
+GET  /dp/<dp_id>/files/metadata?since=<timestamp>
+
+GET  /dp/<dp_id>/files/<file_id>/metadata
+GET  /dp/<dp_id>/files/<file_id>/content
+
+
+// todo:
+ - api: get all changed files related to task_input
+ - api: /api/v1/data/id/files mask=*.dwg 
+
+// Task
+ - Update Data Provider
+ - Run: tests -> gh -> print
+ - Run: tests -> exel
+
+// Loop
+ - get all projects
+ - for each project
+ - get tasks
+ - run each task
+
+// Task: update tree
+input: dp_id + mask
+output: file[]
+
+// Task: tests + exel
+input: dp_id + mask
+output: tests, exel_artifact
+
+// Task: tests + gh + print
+input: dp_id + mask
+output: tests, 3dm_artifact, pdf_artifact
+
+file
+    - filename
+    - hash
+    - tests
+    - exel
+    - 3dm
+    - pdf
+
 ## Test list
 
 1. layerExist         test if Layer is exist
@@ -16,6 +66,18 @@
 - [Rhino3dm JavaScript Sample](https://github.com/mcneel/rhino3dm/blob/master/samples/javascript)
 
 ## Models
+
+### DataProvider
+
+```js
+{
+    type: "Local",
+    name: "MLA+ Server",
+    id: ObjectId,
+    prefix: "",
+    // authToken: "",
+}
+```
 
 ### ProjectFile
 
@@ -108,7 +170,7 @@ Request:
 {
     action: "FILE.TEST",
     payload: {
-        file: "/path/to/file.dwg",
+        fileId: "<file_id>",
         tests: SisuTest[],
     },
 }
@@ -126,21 +188,29 @@ Response:
 ]
 ```
 
-### FILE.UPDATE_PREVIEW
+### FILE.PREVIEW
 
-Make screenshot of dwg model. Upload with `/api/v1/upload`
+Make screenshot of 3dm/dwg model.
 
 ```js
 {
-    action: "FILE.UPDATE_PREVIEW",
+    action: "FILE.PREVIEW",
     payload: {
-        file: "/path/to/file.dwg",
-        resolution: [1920, 1080],
+        fileId: "<file_id>",
+        previews: [
+            {
+                viewport: "Top",
+                size: [1920, 1080],
+            },
+        ],
     },
 }
 ```
+
+
 ## Related projects
 
 ### [nexrender](https://github.com/inlife/nexrender)
+### [HydraShare](https://github.com/HydraShare/hydra/wiki)
 
 Data driven automation for After Effects
