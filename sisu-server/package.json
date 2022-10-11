@@ -83,7 +83,7 @@
     "jest": "^24.7.1",
     "ts-jest": "^24.0.2",
     "concurrently": "^3.5.1",
-    "nodemon": "^1.18.9",
+    "nodemon": "^2.0.20",
     "shelljs": "^0.8.1",
     "supertest": "^3.0.0",
     "ts-node": "^5.0.0",
